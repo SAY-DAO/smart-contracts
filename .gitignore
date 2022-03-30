@@ -1,0 +1,14 @@
+node_modules
+yarn-error.log
+yarn.lock
+.env
+coverage
+coverage.json
+
+#Hardhat files
+cache
+artifacts
+typechain
+deployments
+typechain-types
+gas-report.txt
