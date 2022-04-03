@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { ADDRESS_ZERO } from "../helper-hardhat-config";
+import { ADDRESS_ZERO } from "../app/src/helpers/helper-hardhat-config";
 import { ethers } from "hardhat";
 
 const setupContracts: DeployFunction = async function (

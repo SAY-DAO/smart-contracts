@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
 import verify from "../helper-functions";
-import { networkConfig, developmentChains } from "../helper-hardhat-config";
+import { networkConfig, developmentChains } from "../app/src/helpers/helper-hardhat-config";
 
 // CheckPoint
 const checkPoint = async (

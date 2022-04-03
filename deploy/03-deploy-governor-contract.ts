@@ -8,7 +8,7 @@ import {
   VOTING_PERIOD,
   VOTING_DELAY,
   VOTING_THRESHOLD,
-} from "../helper-hardhat-config";
+} from "../app/src/helpers/helper-hardhat-config";
 
 const deployGovernorContract: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment

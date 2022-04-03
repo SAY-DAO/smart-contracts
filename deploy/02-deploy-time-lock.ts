@@ -5,7 +5,7 @@ import {
   networkConfig,
   developmentChains,
   MIN_DELAY,
-} from "../helper-hardhat-config";
+} from "../app/src/helpers/helper-hardhat-config";
 
 const deployTimeLock: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment

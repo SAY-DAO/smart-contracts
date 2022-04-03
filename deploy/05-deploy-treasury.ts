@@ -5,7 +5,7 @@ import {
   networkConfig,
   developmentChains,
   NEED_RATIO,
-} from "../helper-hardhat-config";
+} from "../app/src/helpers/helper-hardhat-config";
 import { ethers } from "hardhat";
 
 const deployTreasury: DeployFunction = async function (
