@@ -11,6 +11,11 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
+    function initialize() public initializer {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+    }
+
     struct NGO {
         uint256 ngoId;
         string name;
@@ -57,12 +62,7 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     mapping(uint256 => Need) private needById;
     mapping(address => bool) private operatorStatus;
-
-    function initialize() public initializer {
-        __Ownable_init();
-        __UUPSUpgradeable_init();
-    }
-
+    
     modifier onlyOperator(address _address) {
         bool isOperator = operatorStatus[_address];
         require(isOperator, "Only operator is allowed");

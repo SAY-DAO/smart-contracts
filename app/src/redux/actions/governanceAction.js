@@ -32,7 +32,6 @@ export const makeProposal =
 
       const encodedFunctionCall = TreasuryFactory.interface.encodeFunctionData(functionToCall, args)
 
-      console.log(governorFactory);
 
       const { chainId } = await provider.getNetwork();
 

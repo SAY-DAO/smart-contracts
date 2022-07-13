@@ -58,7 +58,6 @@ class Voucher {
       content: "You are authorizing this need to be minted by a friend!",
     };
 
-    console.log(domain, types, voucher);
 
     const signature = await signer._signTypedData(domain, types, voucher);
     return {

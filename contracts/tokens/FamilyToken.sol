@@ -44,7 +44,6 @@ contract FamilyToken is
         _disableInitializers();
     }
 
-    address private voucherAddress;
     event Minted(
         uint256 needId,
         uint256 tokenId,
@@ -53,13 +52,18 @@ contract FamilyToken is
         address friend
     );
 
-    function initialize() public initializer {
+    function initialize(address voucher) public initializer {
         __ERC721_init("FamilyToken", "gSAY");
         __Ownable_init();
         __EIP712_init("SAY-DAO", "1");
         __ERC721Votes_init();
         __UUPSUpgradeable_init();
+        voucherAddress = voucher;
     }
+
+    address public voucherAddress;
+
+    mapping(address => uint256) private needById;
 
     // Collabration between a virtual family memebr and a friend
     modifier verifier(uint256 _needId, address _needContract) {
@@ -70,6 +74,7 @@ contract FamilyToken is
         // }
     }
 
+    // to resolve the signature nd retrieve family address
     function setVoucherVerifier(address newAddress) public onlyOwner {
         voucherAddress = newAddress;
     }
@@ -80,7 +85,6 @@ contract FamilyToken is
         Voucher calldata _voucher
     ) public payable verifier(_needId, _needContract) {
         InterfaceVoucher voucherInterface = InterfaceVoucher(voucherAddress);
-        console.log(voucherAddress);
         address familyMember = voucherInterface._verify(_voucher);
 
         require(
