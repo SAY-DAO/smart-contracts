@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "hardhat/console.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
 string constant SIGNATURE_VERSION = "1";
@@ -15,31 +16,29 @@ contract VerifyVoucher is OwnableUpgradeable, EIP712Upgradeable {
     }
 
     function initialize() public initializer {
-        __EIP712_init("SAY-DAO", "1");
+        __EIP712_init(SIGNING_DOMAIN, SIGNATURE_VERSION);
     }
 
     struct Voucher {
         uint256 needId;
         uint256 mintValue;
-        uint256 mintCount;
-        bytes signature;
         string tokenUri;
         string content;
+        bytes signature;
     }
 
+    event FallingBack(string msg);
 
     function _hash(Voucher calldata _voucher) internal view returns (bytes32) {
         return
-            // _hashTypedDataV4(bytes32 structHash) → bytes32
             _hashTypedDataV4(
                 keccak256(
                     abi.encode(
                         keccak256(
-                            "Voucher(uint256 needId,uint256 mintValue,uint256 mintCount,string tokenUri,string content)"
+                            "Voucher(uint256 needId,uint256 mintValue,string tokenUri,string content)"
                         ),
                         _voucher.needId,
                         _voucher.mintValue,
-                        _voucher.mintCount,
                         keccak256(bytes(_voucher.tokenUri)),
                         keccak256(bytes(_voucher.content))
                     )
@@ -48,14 +47,14 @@ contract VerifyVoucher is OwnableUpgradeable, EIP712Upgradeable {
     }
 
     // returns signer address
-    function _verify(Voucher calldata voucher)
+    function _verify(Voucher calldata _voucher)
         public
         view
         virtual
         returns (address)
     {
-        bytes32 digest = _hash(voucher);
-        return ECDSA.recover(digest, voucher.signature);
+        bytes32 digest = _hash(_voucher);
+        return ECDSA.recover(digest, _voucher.signature);
     }
 
     function getChainID() external view returns (uint256) {
@@ -66,4 +65,8 @@ contract VerifyVoucher is OwnableUpgradeable, EIP712Upgradeable {
         }
         return id;
     }
+
+    // fallback() external {
+    //     emit FallingBack("Store Fall Back");
+    // }
 }

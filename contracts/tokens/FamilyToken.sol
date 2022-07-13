@@ -9,14 +9,14 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "hardhat/console.sol";
 
 struct Voucher {
     uint256 needId;
     uint256 mintValue;
-    uint256 mintCount;
-    bytes signature;
     string tokenUri;
     string content;
+    bytes signature;
 }
 
 interface InterfaceTheNeed {
@@ -45,7 +45,13 @@ contract FamilyToken is
     }
 
     address private voucherAddress;
-    event Minted(uint256 needId, uint256 tokeId);
+    event Minted(
+        uint256 needId,
+        uint256 tokenId,
+        uint256 tokenId2,
+        address familyMember,
+        address friend
+    );
 
     function initialize() public initializer {
         __ERC721_init("FamilyToken", "gSAY");
@@ -57,14 +63,14 @@ contract FamilyToken is
 
     // Collabration between a virtual family memebr and a friend
     modifier verifier(uint256 _needId, address _needContract) {
-        InterfaceTheNeed n = InterfaceTheNeed(_needContract);
-        bool isVerified = n.isNeedVerified(_needId);
-        if (isVerified) {
+        // InterfaceTheNeed n = InterfaceTheNeed(_needContract);
+        // bool isVerified = n.isNeedVerified(_needId);
+        // if (isVerified) {
         _;
-        }
+        // }
     }
 
-    function setVoucherAddress(address newAddress) public onlyOwner {
+    function setVoucherVerifier(address newAddress) public onlyOwner {
         voucherAddress = newAddress;
     }
 
@@ -73,26 +79,34 @@ contract FamilyToken is
         address _needContract,
         Voucher calldata _voucher
     ) public payable verifier(_needId, _needContract) {
-        uint256 tokenId = _tokenIdCounter.current();
         InterfaceVoucher voucherInterface = InterfaceVoucher(voucherAddress);
+        console.log(voucherAddress);
+        address familyMember = voucherInterface._verify(_voucher);
 
-        address signer = voucherInterface._verify(_voucher);
         require(
-            _voucher.mintValue == msg.value,
+            _voucher.mintValue <= msg.value,
             "You must pay the voucher value"
         );
 
         // 1 gSay for family member
         _tokenIdCounter.increment();
-        _safeMint(signer, tokenId);
+        uint256 tokenId = _tokenIdCounter.current();
+        _safeMint(familyMember, tokenId);
         _setTokenURI(tokenId, _voucher.tokenUri);
-        emit Minted(_needId, tokenId);
 
         // 1 gSay for the minter the friend
         _tokenIdCounter.increment();
-        _safeMint(msg.sender, tokenId);
+        uint256 tokenId2 = _tokenIdCounter.current();
+        _safeMint(msg.sender, tokenId2);
         _setTokenURI(tokenId, _voucher.tokenUri);
-        emit Minted(_needId, tokenId);
+
+        emit Minted(
+            _voucher.needId,
+            tokenId,
+            tokenId2,
+            familyMember,
+            msg.sender
+        );
 
         // TODO: transfer the value to the treasury?
     }
