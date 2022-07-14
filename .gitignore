@@ -12,3 +12,4 @@ typechain
 deployments
 typechain-types
 gas-report.txt
+.openzeppelin
