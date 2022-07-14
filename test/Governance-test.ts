@@ -11,6 +11,6 @@ async function deployLockFixture() {
 
 describe("Deployment", function () {
   it("Should upgrade the NFT family tokens", async function () {
-    const { timeLock } = await loadFixture(deployLockFixture);
+    // const { timeLock } = await loadFixture(deployLockFixture);
   });
 });

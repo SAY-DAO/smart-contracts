@@ -8,18 +8,18 @@ import {
 } from "../app/src/helpers/helper-hardhat-config";
 
 // Delegate
-const delegate = async (
-  governanceTokenAddress: string,
-  delegatedAccount: string
-) => {
-  const familyToken = await ethers.getContractAt(
-    "FamilyToken",
-    governanceTokenAddress
-  );
-  const tx = await familyToken.delegate(delegatedAccount);
-  await tx.wait(1); // 1 block wait
-  console.log("Delegated!");
-};
+// const delegate = async (
+//   governanceTokenAddress: string,
+//   delegatedAccount: string
+// ) => {
+//   const familyToken = await ethers.getContractAt(
+//     "FamilyToken",
+//     governanceTokenAddress
+//   );
+//   const tx = await familyToken.delegate(delegatedAccount);
+//   await tx.wait(1); // 1 block wait
+//   console.log("Delegated!");
+// };
 
 // Deployment
 const deployGovernanceToken: DeployFunction = async function (
@@ -51,9 +51,9 @@ const deployGovernanceToken: DeployFunction = async function (
       "contracts/FamilyToken.sol:FamilyToken"
     );
   }
-  log("------------------------- Delegation ---------------------------");
-  log(`Delegating to deployer: ${deployer}`);
-  await delegate(familyToken.address, deployer);
+  // log("------------------------- Delegation ---------------------------");
+  // log(`Delegating to deployer: ${deployer}`);
+  // await delegate(familyToken.address, deployer);
 };
 
 export default deployGovernanceToken;
