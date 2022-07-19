@@ -25,16 +25,7 @@ export async function vote(proposalId: string, voteWay: number, reason: string) 
 
   const proposalState = await governor.state(proposalId)
   // If quorum is reached and votes succeeded = 1 = Active
-  //   enum ProposalState {
-  //     Pending,
-  //     Active,
-  //     Canceled,
-  //     Defeated,
-  //     Succeeded,
-  //     Queued,
-  //     Expired,
-  //     Executed
-  // }
+
   console.log(`Current Proposal State: ${proposalState}`)
   if (developmentChains.includes(network.name)) {
     await moveBlocks(VOTING_PERIOD + 1)
