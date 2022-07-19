@@ -2,61 +2,44 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper-functions";
 import {
-  networkConfig,
-  developmentChains,
   QUORUM_PERCENTAGE,
   VOTING_PERIOD,
   VOTING_DELAY,
   VOTING_THRESHOLD,
-} from "../app/src/helpers/helper-hardhat-config";
+  MIN_DELAY,
+} from "../helpers/helper-hardhat-config";
 import { ethers, upgrades } from "hardhat";
 
 const deployGovernorContract: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ) {
-  const { getNamedAccounts, deployments, network } = hre;
-  const { deploy, log, get } = deployments;
-  const { deployer } = await getNamedAccounts();
-  const timeLock = await get("TimeLock");
+  const { deployments } = hre;
+  const { log } = deployments;
 
-  const FamilyToken = await ethers.getContractFactory("FamilyToken");
-  const mamad = await upgrades.admin.getInstance();
   log(
     "------------------------- GovernorContract Deployment ---------------------------"
   );
+  const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
+  const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
+
+  const FamilyToken = await ethers.getContractFactory("FamilyToken");
+  const familyToken = await upgrades.deployProxy(FamilyToken, [
+    verifyVoucher.address,
+  ]);
+  const TimeLock = await ethers.getContractFactory("TimeLock");
+  const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
   log("Deploying GovernorContract ...");
-  const governorContract = await deploy("GovernorContract", {
-    from: deployer,
-    args: [
-        mamad.address,
-      timeLock.address,
-      VOTING_DELAY,
-      VOTING_PERIOD,
-      VOTING_THRESHOLD,
-      QUORUM_PERCENTAGE,
-    ],
-    log: true,
-    // we need to wait if on a live network so we can verify properly
-    waitConfirmations: networkConfig[network.name].blockConfirmations || 1,
-  });
-  log(`GovernorContract at ${governorContract.address}`);
-  //   if (
-  //     !developmentChains.includes(network.name) &&
-  //     process.env.ETHERSCAN_API_KEY
-  //   ) {
-  //     await verify(
-  //       governorContract.address,
-  //       [
-  //         governanceToken.address,
-  //         timeLock.address,
-  //         VOTING_DELAY,
-  //         VOTING_PERIOD,
-  //         VOTING_THRESHOLD,
-  //         QUORUM_PERCENTAGE,
-  //       ],
-  //       "contracts/standards/GovernorContract.sol:GovernorContract"
-  //     );
-  //   }
+  const GovernorContract = await ethers.getContractFactory("GovernorContract");
+  const governorContract = await upgrades.deployProxy(GovernorContract, [
+    familyToken.address,
+    timeLock.address,
+    VOTING_DELAY,
+    VOTING_PERIOD,
+    VOTING_THRESHOLD,
+    QUORUM_PERCENTAGE,
+  ]);
+
+  log(`GovernorContract deployed at: ${governorContract.address}`);
 };
 
 export default deployGovernorContract;

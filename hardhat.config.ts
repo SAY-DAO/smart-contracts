@@ -8,7 +8,8 @@ import "solidity-coverage";
 import "hardhat-deploy";
 import "@openzeppelin/hardhat-upgrades";
 
-import { HardhatUserConfig } from "hardhat/config";
+import { extendEnvironment, HardhatUserConfig, task } from "hardhat/config";
+import { MIN_DELAY } from "./helpers/helper-hardhat-config";
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "";
@@ -24,7 +25,7 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     localhost: {
-      chainId: 31337,
+      chainId: 31337, // the hardhat node
     },
     rinkeby: {
       url: RINKEBY_RPC_URL,

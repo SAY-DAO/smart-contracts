@@ -4,12 +4,16 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "hardhat/console.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
 string constant SIGNATURE_VERSION = "1";
 
-contract VerifyVoucher is OwnableUpgradeable, EIP712Upgradeable {
+contract VerifyVoucher is
+    OwnableUpgradeable,
+    EIP712Upgradeable,
+    UUPSUpgradeable
+{
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -66,7 +70,13 @@ contract VerifyVoucher is OwnableUpgradeable, EIP712Upgradeable {
         return id;
     }
 
-    // fallback() external {
-    //     emit FallingBack("Store Fall Back");
-    // }
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        override
+        onlyOwner
+    {}
+
+    fallback() external {
+        emit FallingBack("Store Fall Back");
+    }
 }

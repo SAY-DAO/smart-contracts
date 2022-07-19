@@ -2,30 +2,34 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helper-functions";
 import {
-  networkConfig,
   developmentChains,
   NEED_RATIO,
-} from "../app/src/helpers/helper-hardhat-config";
-import { ethers } from "hardhat";
+  MIN_DELAY,
+} from "../helpers/helper-hardhat-config";
+import { ethers, upgrades } from "hardhat";
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
 const deployTreasury: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ) {
   // @ts-ignore
-  const { getNamedAccounts, deployments, network } = hre;
-  const { deploy, log, get } = deployments;
-  const { deployer } = await getNamedAccounts();
+  const { deployments, network } = hre;
+  const { log } = deployments;
+
   log(
     "------------------------- Treasury Deployment ---------------------------"
   );
   log("Deploying Treasury ...");
-  const treasury = await deploy("Treasury", {
-    from: deployer,
-    args: [NEED_RATIO],
-    log: true,
-    // we need to wait if on a live network so we can verify properly
-    waitConfirmations: networkConfig[network.name].blockConfirmations || 1,
-  });
+
+  const TimeLock = await ethers.getContractFactory("TimeLock");
+  const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
+
+  const Treasury = await ethers.getContractFactory("Treasury");
+  const treasury = await upgrades.deployProxy(Treasury, [
+    timeLock.address,
+    NEED_RATIO,
+  ]);
+
   log(`Treasury deployed at at ${treasury.address}`);
   if (
     !developmentChains.includes(network.name) &&
@@ -42,13 +46,19 @@ const deployTreasury: DeployFunction = async function (
     treasury.address
   );
 
-  const timeLockAddress = (await get("TimeLock")).address;
-  const timeLock = await ethers.getContractAt("TimeLock", timeLockAddress);
-  const ownerAddress = await treasuryContract.owner();
-  if (ownerAddress !== timeLock.address) {
-    const transferTx = await treasuryContract.transferOwnership(
+  const TIME_LOCK_ROLE = keccak256(toUtf8Bytes("TIME_LOCK_ROLE"));
+  const isTimeLockOwner = await treasuryContract.hasRole(
+    TIME_LOCK_ROLE,
+    timeLock.address
+  );
+  if (!isTimeLockOwner) {
+    const transferTx = await treasuryContract.grantRole(
+      TIME_LOCK_ROLE,
       timeLock.address
     );
+    log(`Transfered ownership`);
+    log(transferTx);
+
     await transferTx.wait(1);
   }
   log(`Treasury NOW is owned and governed by TimeLock: ${timeLock.address}`);

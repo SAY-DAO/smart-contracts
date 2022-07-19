@@ -24,7 +24,7 @@ export async function propose(args: any[], functionToCall: string, proposalDescr
         [encodedFunctionCall],
         proposalDescription
     )
-    // If working on a development chain, we will speed tp to voting period by moving blocks froward.
+    // If working on a development chain, we will speed up voting period by moving blocks froward.
     if (developmentChains.includes(network.name)) {
         await moveBlocks(VOTING_DELAY + 1)
     }

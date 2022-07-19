@@ -26,7 +26,7 @@ export const QUORUM_PERCENTAGE = 50; // Require 50% of voters to pass
 export const MIN_DELAY = 3600; // 1 hour
 export const VOTING_PERIOD = 5; // Blocks 45818 = 1 week in live network
 export const VOTING_DELAY = 1; // 1 Block - proposal vote becomes active
-export const VOTING_THRESHOLD = 1; // 1 Block - proposal vote becomes active
+export const VOTING_THRESHOLD = 1; // Minimum number of votes an account must have to create a proposal.
 export const NEED_RATIO = "0.5";
 
 export const NEW_NEED_RATIO = "0.7";

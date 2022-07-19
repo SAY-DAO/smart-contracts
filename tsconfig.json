@@ -5,8 +5,9 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+    "resolveJsonModule": true
   },
-  "include": ["./scripts", "./test", "./deploy", "./deploy-helpers"],
-  "files": ["./hardhat.config.ts", "app/src/helpers/helper-hardhat-config.ts"]
+  "include": ["./scripts", "./test", "./deploy", "./deploy-helpers", "contracts/tokens/temp"],
+  "files": ["./hardhat.config.ts", "helpers/helper-hardhat-config.ts"]
 }

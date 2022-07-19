@@ -5,27 +5,23 @@ import {
   networkConfig,
   developmentChains,
   MIN_DELAY,
-} from "../app/src/helpers/helper-hardhat-config";
+} from "../helpers/helper-hardhat-config";
+import { getImplementationAddress } from "@openzeppelin/upgrades-core";
+import { ethers, upgrades } from "hardhat";
 
 const deployTimeLock: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ) {
   // @ts-ignore
-  const { getNamedAccounts, deployments, network } = hre;
-  const { deploy, log } = deployments;
-  const { deployer } = await getNamedAccounts();
+  const { deployments, network } = hre;
+  const { log } = deployments;
   log(
     "------------------------- TimeLock Deployment ---------------------------"
   );
   log("Deploying TimeLock ...");
-  const timeLock = await deploy("TimeLock", {
-    from: deployer,
-    args: [MIN_DELAY, [], []],
-    log: true,
-    // we need to wait if on a live network so we can verify properly
-    waitConfirmations: networkConfig[network.name].blockConfirmations || 1,
-  });
-  log(`TimeLock deployed at: ${timeLock.address}`);
+  const TimeLock = await ethers.getContractFactory("TimeLock");
+  const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
+
   if (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY
@@ -36,7 +32,8 @@ const deployTimeLock: DeployFunction = async function (
       "contracts/standards/TimeLock.sol:TimeLock"
     );
   }
+  log(`TimeLock deployed at: ${timeLock.address}`);
 };
-
 export default deployTimeLock;
 deployTimeLock.tags = ["all", "timelock"];
+module.exports.dependencies = ["FamilyToken"]; // this ensure the Token script above is executed first, so `deployments.get('Token')` succeeds

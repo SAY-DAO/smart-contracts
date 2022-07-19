@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
-import "hardhat/console.sol";
 
 struct Voucher {
     uint256 needId;
@@ -44,6 +43,15 @@ contract FamilyToken is
         _disableInitializers();
     }
 
+    function initialize(address voucherContract) public initializer {
+        __ERC721_init("FamilyToken", "gSAY");
+        __Ownable_init();
+        __EIP712_init("SAY-DAO", "1");
+        __ERC721Votes_init();
+        __UUPSUpgradeable_init();
+        voucherAddress = voucherContract;
+    }
+
     event Minted(
         uint256 needId,
         uint256 tokenId,
@@ -51,15 +59,6 @@ contract FamilyToken is
         address familyMember,
         address friend
     );
-
-    function initialize(address voucher) public initializer {
-        __ERC721_init("FamilyToken", "gSAY");
-        __Ownable_init();
-        __EIP712_init("SAY-DAO", "1");
-        __ERC721Votes_init();
-        __UUPSUpgradeable_init();
-        voucherAddress = voucher;
-    }
 
     address public voucherAddress;
 
@@ -115,6 +114,15 @@ contract FamilyToken is
         // TODO: transfer the value to the treasury?
     }
 
+    // function _getVotingUnits(address account)
+    //     internal
+    //     view
+    //     override
+    //     returns (uint256)
+    // {
+    //     return 15;
+    // }
+
     function _burn(uint256 tokenId)
         internal
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
@@ -136,8 +144,6 @@ contract FamilyToken is
         override
         onlyOwner
     {}
-
-    // The following functions are overrides required by Solidity.
 
     function _afterTokenTransfer(
         address from,
