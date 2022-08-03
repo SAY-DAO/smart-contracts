@@ -24,12 +24,10 @@ const setupContracts: DeployFunction = async function (
   const isProposer = await timeLock.hasRole(proposer, timeLock.address);
   const isExecutor = await timeLock.hasRole(executor, ADDRESS_ZERO);
   const isAdmin = await timeLock.hasRole(admin, timeLock.address);
-  const isTimeLockAdmin = await timeLock.hasRole(admin, timeLock.address);
 
   log(`isProposer : ${isProposer} - ${timeLock.address}`);
   log(`isExecutor : ${isExecutor} - ${ADDRESS_ZERO}`);
   log(`isDeployerAdmin: ${isAdmin} - ${deployer}`);
-  log(`isTimeLockAdmin: ${isTimeLockAdmin} - ${timeLock.address}`);
   log("Granting TimeLock ...");
 
   if (!isProposer) {

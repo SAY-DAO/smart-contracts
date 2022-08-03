@@ -10,7 +10,6 @@ import {
   MIN_DELAY,
   ADDRESS_ZERO,
   NEED_RATIO,
-  developmentChains,
   NEW_NEED_RATIO,
   FUNC,
   PROPOSAL_DESCRIPTION,
@@ -21,9 +20,10 @@ import { moveBlocks } from "../helpers/utils/move-blocks";
 import { moveTime } from "../helpers/utils/move-time";
 import { Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
 async function deployLockFixture() {
-  const [owner] = await ethers.getSigners();
+  const [owner, familyMember, friend] = await ethers.getSigners();
   const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
   const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
 
@@ -55,6 +55,7 @@ async function deployLockFixture() {
 
   return {
     owner,
+    familyMember,
     verifyVoucher,
     theNeed,
     familyToken,
@@ -66,8 +67,7 @@ async function deployLockFixture() {
 
 async function signTransaction(familyToken: Contract, verifyVoucher: Contract) {
   // Contracts are deployed using the first signer/account by default
-  const [familyMember, friend] = await ethers.getSigners();
-
+  const [owner, familyMember, friend] = await ethers.getSigners();
   const friendContract = familyToken.connect(friend);
   const mintValue = ethers.utils.parseUnits("0.054", "ether");
   const voucher = new Voucher();
@@ -103,6 +103,7 @@ async function delegateAndPropose(
     NEW_NEED_RATIO,
   ]);
 
+  // friend has voting power
   const proposeTx = await governorContract.connect(friend).propose(
     [treasury.address], // target
     [0], // Eth values
@@ -121,7 +122,6 @@ async function delegateAndPropose(
 
   expect(await governorContract.state(proposalId)).to.equal(1); // active
   expect(proposalDeadline - proposalSnapShot).to.equal(VOTING_PERIOD);
-
   return {
     proposalId,
     proposalSnapShot,
@@ -202,8 +202,15 @@ describe("Deployment", function () {
 
   it("Should add to queue and execute!", async function () {
     // deploy
-    const { verifyVoucher, theNeed, familyToken, governorContract, treasury } =
-      await loadFixture(deployLockFixture);
+    const {
+      owner,
+      verifyVoucher,
+      theNeed,
+      familyToken,
+      timeLock,
+      governorContract,
+      treasury,
+    } = await loadFixture(deployLockFixture);
 
     // sign & mint
     const { familyMember, friend, friendContract, mintValue, theVoucher } =
@@ -222,11 +229,9 @@ describe("Deployment", function () {
     );
 
     console.log("Voting...");
-    const voteTx = await governorContract.connect(friend).castVoteWithReason(
-      proposalId,
-      SUPPORT,
-      REASON
-    );
+    const voteTx = await governorContract
+      .connect(friend)
+      .castVoteWithReason(proposalId, SUPPORT, REASON);
 
     const voteTxReceipt = await voteTx.wait(1); // wait for transaction being confirmed
     // console.log(voteTxReceipt.events[0].args);
@@ -238,29 +243,58 @@ describe("Deployment", function () {
     expect(await governorContract.state(proposalId)).is.equal(4); // succeeded state
     console.log("Queueing...");
 
-    // to queue a proposal to the timelock.
-    // const queueTx = await governorContract.queue(
-    //   [treasury.address], // address[] memory targets
-    //   [0], // uint256[] memory values
-    //   [encodedFunctionCall], // bytes[] memory calldatas
-    //   descriptionHash //bytes32 descriptionHash
-    // );
-    // await queueTx.wait(1);
+    const encodedFunctionCall = treasury.interface.encodeFunctionData(FUNC, [
+      NEW_NEED_RATIO,
+    ]);
 
-    // await moveTime(MIN_DELAY + 1);
-    // await moveBlocks(1);
-    // check the eta of a queued proposal
-    // console.log(await governorContract.proposalEta(proposalId));
-    // console.log("Executing...");
-    // console.log(await governorContract.quorum(10));
-    // // this will fail on a testnet because you need to wait for the MIN_DELAY!
-    // const executeTx = await governorContract.execute(
-    //   [treasury.address], // address[] memory targets,
-    //   [0], // uint256[] memory values,
-    //   [encodedFunctionCall], // bytes[] memory calldatas,
-    //   descriptionHash // bytes32 descriptionHash
-    // );
-    // await executeTx.wait(1);
-    // console.log(await treasury.fetchNeedRatio()); // after execution
+    const descriptionHash = ethers.utils.keccak256(
+      ethers.utils.toUtf8Bytes(PROPOSAL_DESCRIPTION)
+    );
+
+    const proposerRole = await timeLock.PROPOSER_ROLE();
+    const executorRole = await timeLock.EXECUTOR_ROLE();
+    const adminRole = await timeLock.TIMELOCK_ADMIN_ROLE();
+
+    const proposerTx = await timeLock.grantRole(
+      proposerRole,
+      governorContract.address
+    );
+    await proposerTx.wait(1);
+    const executorTx = await timeLock.grantRole(executorRole, ADDRESS_ZERO);
+    await executorTx.wait(1);
+    const revokeTx = await timeLock.revokeRole(adminRole, owner.address);
+    await revokeTx.wait(1);
+
+    expect(
+      await timeLock.hasRole(proposerRole, governorContract.address)
+    ).to.equal(true);
+    expect(await timeLock.hasRole(proposerRole, ADDRESS_ZERO)).to.equal(false);
+    expect(await timeLock.hasRole(adminRole, owner.address)).to.equal(false);
+
+    // queue a proposal by the governor.
+    const queueTx = await governorContract.queue(
+      [treasury.address], // address[] memory targets
+      [0], // uint256[] memory values
+      [encodedFunctionCall], // bytes[] memory calldatas
+      descriptionHash //bytes32 descriptionHash
+    );
+    await queueTx.wait(1);
+
+    await moveTime(MIN_DELAY + 1);
+    await moveBlocks(1);
+
+    console.log("Executing...");
+    console.log(await governorContract.quorum(10));
+
+    // this will fail on a testnet because you need to wait for the MIN_DELAY!
+    const executeTx = await governorContract.execute(
+      [treasury.address], // address[] memory targets,
+      [0], // uint256[] memory values,
+      [encodedFunctionCall], // bytes[] memory calldatas,
+      descriptionHash // bytes32 descriptionHash
+    );
+    await executeTx.wait(1);
+
+    expect(await treasury.fetchNeedRatio()).to.equal(NEW_NEED_RATIO); // after execution
   });
 });
