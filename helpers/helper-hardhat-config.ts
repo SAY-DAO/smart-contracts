@@ -22,7 +22,7 @@ export const proposalsFile = "proposals.json";
 
 // Governor Values
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-export const QUORUM_PERCENTAGE = 70; // Require 50% of voters to pass
+export const QUORUM_PERCENTAGE = 0; // Require 50% of voters to pass
 export const MIN_DELAY = 3600; // 1 hour
 export const VOTING_PERIOD = 10; // Blocks 45818 = 1 week in live network
 export const VOTING_DELAY = 1; // 1 Block - proposal vote becomes active
@@ -32,3 +32,7 @@ export const NEED_RATIO = "0.5";
 export const NEW_NEED_RATIO = "0.7";
 export const FUNC = "updateNeedRatio";
 export const PROPOSAL_DESCRIPTION = "Proposal #1 Changed Need_Ratio to 0.7!";
+
+// 0 = Against, 1 = For, 2 = Abstain
+export const SUPPORT = 1;
+export const REASON = "my reasons!";

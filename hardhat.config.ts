@@ -8,8 +8,7 @@ import "solidity-coverage";
 import "hardhat-deploy";
 import "@openzeppelin/hardhat-upgrades";
 
-import { extendEnvironment, HardhatUserConfig, task } from "hardhat/config";
-import { MIN_DELAY } from "./helpers/helper-hardhat-config";
+import { HardhatUserConfig } from "hardhat/config";
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "";

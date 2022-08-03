@@ -45,12 +45,6 @@ contract GovernorContract is
         __UUPSUpgradeable_init();
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {}
-
     // The following functions are overrides required by Solidity.
 
     function votingDelay()
@@ -145,6 +139,12 @@ contract GovernorContract is
     {
         return super._executor();
     }
+
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        override
+        onlyOwner
+    {}
 
     function supportsInterface(bytes4 interfaceId)
         public

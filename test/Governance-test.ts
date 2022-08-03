@@ -13,8 +13,12 @@ import {
   developmentChains,
   NEW_NEED_RATIO,
   FUNC,
+  PROPOSAL_DESCRIPTION,
+  SUPPORT,
+  REASON,
 } from "../helpers/helper-hardhat-config";
 import { moveBlocks } from "../helpers/utils/move-blocks";
+import { moveTime } from "../helpers/utils/move-time";
 import { Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
@@ -98,40 +102,30 @@ async function delegateAndPropose(
   const encodedFunctionCall = treasury.interface.encodeFunctionData(FUNC, [
     NEW_NEED_RATIO,
   ]);
-  const proposalDescription = "This is my proposal description!";
 
   const proposeTx = await governorContract.connect(friend).propose(
     [treasury.address], // target
     [0], // Eth values
     [encodedFunctionCall], // calldata
-    proposalDescription
+    PROPOSAL_DESCRIPTION
   );
 
   const proposeReceipt = await proposeTx.wait(1);
   const proposalId = proposeReceipt.events[0].args.proposalId;
-
+  expect(await governorContract.state(proposalId)).to.equal(0); // pending
   const proposalSnapShot = await governorContract.proposalSnapshot(proposalId);
   const proposalDeadline = await governorContract.proposalDeadline(proposalId);
 
   //  we will speed up voting period by moving blocks froward.
   await moveBlocks(VOTING_DELAY + 1);
 
-  // 0 = Against, 1 = For, 2 = Abstain
-  const voteWay = 1;
-  const reason = "my reasons!";
-  const voteTx = await governorContract.castVoteWithReason(
-    proposalId,
-    voteWay,
-    reason
-  );
-  const voteTxReceipt = await voteTx.wait(1);
+  expect(await governorContract.state(proposalId)).to.equal(1); // active
+  expect(proposalDeadline - proposalSnapShot).to.equal(VOTING_PERIOD);
 
   return {
     proposalId,
     proposalSnapShot,
     proposalDeadline,
-    reason,
-    voteTxReceipt,
   };
 }
 
@@ -173,7 +167,7 @@ describe("Deployment", function () {
     expect(await treasury.hasRole(TIME_LOCK_ROLE, timeLock.address)).to.be.true;
   });
 
-  it("Should mint, delegate and propose", async function () {
+  it("Should mint, delegate, propose and vote", async function () {
     // deploy
     const { verifyVoucher, theNeed, familyToken, governorContract, treasury } =
       await loadFixture(deployLockFixture);
@@ -187,38 +181,86 @@ describe("Deployment", function () {
         value: mintValue,
       })
     )
-      .to.emit(familyToken, "Minted") // transfer from null address to minter
-      .withArgs(theVoucher.needId, 1, 2, familyMember.address, friend.address); // transfer from minter to redeemer
+      .to.emit(familyToken, "Minted")
+      .withArgs(theVoucher.needId, 1, 2, familyMember.address, friend.address);
     expect(await familyToken.ownerOf(1)).to.equal(familyMember.address);
     expect(await familyToken.ownerOf(2)).to.equal(friend.address);
 
     // delegate & propose
-    const {
-      proposalId,
-      proposalSnapShot,
-      proposalDeadline,
-      reason,
-      voteTxReceipt,
-    } = await delegateAndPropose(
+    const { proposalId, proposalSnapShot, proposalDeadline } =
+      await delegateAndPropose(
+        friendContract,
+        friend,
+        governorContract,
+        treasury
+      );
+
+    expect(proposalDeadline - proposalSnapShot).is.equal(VOTING_PERIOD);
+    //   enum ProposalState: Pending,Active,Canceled,Defeated,Succeeded,Queued,Expired,Executed
+    expect(await governorContract.state(proposalId)).is.equal(1);
+  });
+
+  it("Should add to queue and execute!", async function () {
+    // deploy
+    const { verifyVoucher, theNeed, familyToken, governorContract, treasury } =
+      await loadFixture(deployLockFixture);
+
+    // sign & mint
+    const { familyMember, friend, friendContract, mintValue, theVoucher } =
+      await signTransaction(familyToken, verifyVoucher);
+
+    await friendContract.safeMint(13, theNeed.address, theVoucher, {
+      value: mintValue,
+    });
+
+    console.log("Proposing...");
+    const { proposalId } = await delegateAndPropose(
       friendContract,
       friend,
       governorContract,
       treasury
     );
 
-    expect(proposalDeadline - proposalSnapShot).is.equal(VOTING_PERIOD);
-    expect(voteTxReceipt.events[0].args.reason).is.equal(reason);
+    console.log("Voting...");
+    const voteTx = await governorContract.connect(friend).castVoteWithReason(
+      proposalId,
+      SUPPORT,
+      REASON
+    );
 
-    //   enum ProposalState: Pending,Active,Canceled,Defeated,Succeeded,Queued,Expired,Executed
-    expect(await governorContract.state(proposalId)).is.equal(1);
-  });
+    const voteTxReceipt = await voteTx.wait(1); // wait for transaction being confirmed
+    // console.log(voteTxReceipt.events[0].args);
 
-  it("Should vote!", async function () {
-    // const proposals = JSON.parse(fs.readFileSync(proposalsFile, "utf8"));
-    // // You could swap this out for the ID you want to use too
-    // const proposalId = proposals[network.config.chainId!][proposalIndex];
-    // // 0 = Against, 1 = For, 2 = Abstain
-    // const voteWay = 1;
-    // const reason = "my reasons!";
+    await moveBlocks(VOTING_PERIOD + 1);
+
+    console.log(await treasury.fetchNeedRatio()); // before execution
+
+    expect(await governorContract.state(proposalId)).is.equal(4); // succeeded state
+    console.log("Queueing...");
+
+    // to queue a proposal to the timelock.
+    // const queueTx = await governorContract.queue(
+    //   [treasury.address], // address[] memory targets
+    //   [0], // uint256[] memory values
+    //   [encodedFunctionCall], // bytes[] memory calldatas
+    //   descriptionHash //bytes32 descriptionHash
+    // );
+    // await queueTx.wait(1);
+
+    // await moveTime(MIN_DELAY + 1);
+    // await moveBlocks(1);
+    // check the eta of a queued proposal
+    // console.log(await governorContract.proposalEta(proposalId));
+    // console.log("Executing...");
+    // console.log(await governorContract.quorum(10));
+    // // this will fail on a testnet because you need to wait for the MIN_DELAY!
+    // const executeTx = await governorContract.execute(
+    //   [treasury.address], // address[] memory targets,
+    //   [0], // uint256[] memory values,
+    //   [encodedFunctionCall], // bytes[] memory calldatas,
+    //   descriptionHash // bytes32 descriptionHash
+    // );
+    // await executeTx.wait(1);
+    // console.log(await treasury.fetchNeedRatio()); // after execution
   });
 });
