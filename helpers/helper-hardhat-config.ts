@@ -22,7 +22,7 @@ export const proposalsFile = "proposals.json";
 
 // Governor Values
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-export const QUORUM_PERCENTAGE = 0; // Require 50% of voters to pass
+export const QUORUM_PERCENTAGE = 10; // Require 50% of voters to pass
 export const MIN_DELAY = 3600; // 1 hour
 export const VOTING_PERIOD = 10; // Blocks 45818 = 1 week in live network
 export const VOTING_DELAY = 1; // 1 Block - proposal vote becomes active

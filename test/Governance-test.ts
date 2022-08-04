@@ -18,7 +18,7 @@ import {
 } from "../helpers/helper-hardhat-config";
 import { moveBlocks } from "../helpers/utils/move-blocks";
 import { moveTime } from "../helpers/utils/move-time";
-import { Contract } from "ethers";
+import { Contract, providers } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
@@ -95,9 +95,9 @@ async function delegateAndPropose(
   governorContract: Contract,
   treasury: Contract
 ) {
-  //delegate to be able vote
+  //delegate to be able vote - token 1 for familyMember, 2 for friend
   const tx = await friendContract.delegate(await friendContract.ownerOf(2));
-  await tx.wait(1); // 1 block wait
+  await tx.wait(1); // wait until the transaction is mined
 
   const encodedFunctionCall = treasury.interface.encodeFunctionData(FUNC, [
     NEW_NEED_RATIO,
@@ -167,7 +167,7 @@ describe("Deployment", function () {
     expect(await treasury.hasRole(TIME_LOCK_ROLE, timeLock.address)).to.be.true;
   });
 
-  it("Should mint, delegate, propose and vote", async function () {
+  it("Should mint, delegate, propose, vote, add to queue and execute", async function () {
     // deploy
     const { verifyVoucher, theNeed, familyToken, governorContract, treasury } =
       await loadFixture(deployLockFixture);
@@ -234,13 +234,25 @@ describe("Deployment", function () {
       .castVoteWithReason(proposalId, SUPPORT, REASON);
 
     const voteTxReceipt = await voteTx.wait(1); // wait for transaction being confirmed
-    // console.log(voteTxReceipt.events[0].args);
 
+    // weight of the vote
+    expect(
+      await friendContract.getPastVotes(friend.address, voteTx.blockNumber - 1)
+    ).to.equal(voteTxReceipt.events[0].args.weight);
+
+    // total supply of votes available at the end of a past block
+    expect(
+      await friendContract.getPastTotalSupply(voteTx.blockNumber - 1)
+    ).to.equal(2);
+
+    console.log(
+      await friendContract.getPastTotalSupply(voteTx.blockNumber - 1)
+    );
     await moveBlocks(VOTING_PERIOD + 1);
-
-    console.log(await treasury.fetchNeedRatio()); // before execution
-
     expect(await governorContract.state(proposalId)).is.equal(4); // succeeded state
+
+    expect(await treasury.fetchNeedRatio()).to.equal(NEED_RATIO); // before execution
+
     console.log("Queueing...");
 
     const encodedFunctionCall = treasury.interface.encodeFunctionData(FUNC, [
@@ -284,8 +296,7 @@ describe("Deployment", function () {
     await moveBlocks(1);
 
     console.log("Executing...");
-    console.log(await governorContract.quorum(10));
-
+    console.log(await governorContract.quorum(queueTx.blockNumber - 1));
     // this will fail on a testnet because you need to wait for the MIN_DELAY!
     const executeTx = await governorContract.execute(
       [treasury.address], // address[] memory targets,
@@ -294,7 +305,6 @@ describe("Deployment", function () {
       descriptionHash // bytes32 descriptionHash
     );
     await executeTx.wait(1);
-
     expect(await treasury.fetchNeedRatio()).to.equal(NEW_NEED_RATIO); // after execution
   });
 });
