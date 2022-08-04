@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers, upgrades } from "hardhat";
-import verify from "../helpers/helper-functions";
+import verify from "../helper-functions";
 import { developmentChains } from "../helpers/helper-hardhat-config";
 
 // Deployment
