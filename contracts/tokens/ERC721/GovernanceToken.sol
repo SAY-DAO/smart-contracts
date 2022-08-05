@@ -104,7 +104,7 @@ contract GovernanceToken is
             "You must pay the voucher value"
         );
 
-        // 1 gSay for family member
+        // 1 gSay for the family member
         _tokenIdCounter.increment();
         uint256 tokenId = _tokenIdCounter.current();
         _safeMint(familyMember, tokenId);

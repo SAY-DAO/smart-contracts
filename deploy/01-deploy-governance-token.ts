@@ -1,11 +1,11 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers, upgrades } from "hardhat";
-import verify from "../helper-functions";
 import {
   ADDRESS_ZERO,
   developmentChains,
 } from "../helpers/helper-hardhat-config";
+import verify from "../helpers/helper-functions";
 
 // Deployment
 const deployGovernanceToken: DeployFunction = async function (
