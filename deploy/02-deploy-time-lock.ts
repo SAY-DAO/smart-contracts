@@ -36,4 +36,4 @@ const deployTimeLock: DeployFunction = async function (
 };
 export default deployTimeLock;
 deployTimeLock.tags = ["all", "timelock"];
-module.exports.dependencies = ["FamilyToken"]; // this ensure the Token script above is executed first, so `deployments.get('Token')` succeeds
+module.exports.dependencies = ["GovernanceToken"]; // this ensure the Token script above is executed first, so `deployments.get('Token')` succeeds

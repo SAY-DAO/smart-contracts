@@ -23,15 +23,16 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
 async function deployLockFixture() {
-  const [owner, familyMember, friend] = await ethers.getSigners();
+  const [owner, familyMember, friend, sayAdmin] = await ethers.getSigners();
   const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
   const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
 
   const TheNeed = await ethers.getContractFactory("TheNeed");
   const theNeed = await upgrades.deployProxy(TheNeed, []);
 
-  const FamilyToken = await ethers.getContractFactory("FamilyToken");
-  const familyToken = await upgrades.deployProxy(FamilyToken, [
+  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
+  const governanceToken = await upgrades.deployProxy(GovernanceToken, [
+    sayAdmin.address,
     verifyVoucher.address,
   ]);
   const TimeLock = await ethers.getContractFactory("TimeLock");
@@ -39,7 +40,7 @@ async function deployLockFixture() {
 
   const GovernorContract = await ethers.getContractFactory("GovernorContract");
   const governorContract = await upgrades.deployProxy(GovernorContract, [
-    familyToken.address,
+    governanceToken.address,
     timeLock.address,
     VOTING_DELAY,
     VOTING_PERIOD,
@@ -54,21 +55,25 @@ async function deployLockFixture() {
   ]);
 
   return {
+    sayAdmin,
     owner,
     familyMember,
     verifyVoucher,
     theNeed,
-    familyToken,
+    governanceToken,
     timeLock,
     governorContract,
     treasury,
   };
 }
 
-async function signTransaction(familyToken: Contract, verifyVoucher: Contract) {
+async function signTransaction(
+  governanceToken: Contract,
+  verifyVoucher: Contract
+) {
   // Contracts are deployed using the first signer/account by default
   const [owner, familyMember, friend] = await ethers.getSigners();
-  const friendContract = familyToken.connect(friend);
+  const friendContract = governanceToken.connect(friend);
   const mintValue = ethers.utils.parseUnits("0.054", "ether");
   const voucher = new Voucher();
   const { ...theVoucher } = await voucher.signTransaction({
@@ -131,10 +136,10 @@ async function delegateAndPropose(
 
 describe("Deployment", function () {
   it("Should deploy and setup governance", async function () {
-    const { verifyVoucher, familyToken, timeLock, governorContract } =
+    const { verifyVoucher, governanceToken, timeLock, governorContract } =
       await loadFixture(deployLockFixture);
     expect(verifyVoucher.address).is.not.equal(ADDRESS_ZERO);
-    expect(familyToken.address).is.not.equal(ADDRESS_ZERO);
+    expect(governanceToken.address).is.not.equal(ADDRESS_ZERO);
     expect(timeLock.address).is.not.equal(ADDRESS_ZERO);
     expect(governorContract.address).is.not.equal(ADDRESS_ZERO);
   });
@@ -169,22 +174,27 @@ describe("Deployment", function () {
 
   it("Should mint, delegate, propose, vote, add to queue and execute", async function () {
     // deploy
-    const { verifyVoucher, theNeed, familyToken, governorContract, treasury } =
-      await loadFixture(deployLockFixture);
+    const {
+      verifyVoucher,
+      theNeed,
+      governanceToken,
+      governorContract,
+      treasury,
+    } = await loadFixture(deployLockFixture);
 
     // sign & mint
     const { familyMember, friend, friendContract, mintValue, theVoucher } =
-      await signTransaction(familyToken, verifyVoucher);
+      await signTransaction(governanceToken, verifyVoucher);
 
     expect(
-      await friendContract.safeMint(13, theNeed.address, theVoucher, {
+      await friendContract.safeFamilyMint(13, theNeed.address, theVoucher, {
         value: mintValue,
       })
     )
-      .to.emit(familyToken, "Minted")
+      .to.emit(governanceToken, "Minted")
       .withArgs(theVoucher.needId, 1, 2, familyMember.address, friend.address);
-    expect(await familyToken.ownerOf(1)).to.equal(familyMember.address);
-    expect(await familyToken.ownerOf(2)).to.equal(friend.address);
+    expect(await governanceToken.ownerOf(1)).to.equal(familyMember.address);
+    expect(await governanceToken.ownerOf(2)).to.equal(friend.address);
 
     // delegate & propose
     const { proposalId, proposalSnapShot, proposalDeadline } =
@@ -206,7 +216,7 @@ describe("Deployment", function () {
       owner,
       verifyVoucher,
       theNeed,
-      familyToken,
+      governanceToken,
       timeLock,
       governorContract,
       treasury,
@@ -214,9 +224,9 @@ describe("Deployment", function () {
 
     // sign & mint
     const { familyMember, friend, friendContract, mintValue, theVoucher } =
-      await signTransaction(familyToken, verifyVoucher);
+      await signTransaction(governanceToken, verifyVoucher);
 
-    await friendContract.safeMint(13, theNeed.address, theVoucher, {
+    await friendContract.safeFamilyMint(13, theNeed.address, theVoucher, {
       value: mintValue,
     });
 
@@ -306,5 +316,33 @@ describe("Deployment", function () {
     );
     await executeTx.wait(1);
     expect(await treasury.fetchNeedRatio()).to.equal(NEW_NEED_RATIO); // after execution
+  });
+
+  it("Should upgrade the Governance token", async function () {
+    const { sayAdmin, verifyVoucher, governanceToken } = await loadFixture(
+      deployLockFixture
+    );
+
+    const GovernanceTokenV2 = await ethers.getContractFactory(
+      "GovernanceTokenV2"
+    );
+    const governanceTokenV2 = await upgrades.upgradeProxy(
+      governanceToken,
+      GovernanceTokenV2
+    );
+
+    expect(await governanceTokenV2.voucherAddress()).to.equal(
+      verifyVoucher.address
+    );
+
+    await governanceTokenV2
+      .connect(sayAdmin) // only say admin
+      .setVoucherVerifier("0x0000000000000000000000000000000000000001");
+
+    expect(await governanceToken.voucherAddress()).to.equal(
+      "0x0000000000000000000000000000000000000001"
+    );
+
+    expect(await governanceTokenV2.version()).to.equal("v2");
   });
 });

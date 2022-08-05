@@ -22,8 +22,8 @@ const deployGovernorContract: DeployFunction = async function (
   const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
   const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
 
-  const FamilyToken = await ethers.getContractFactory("FamilyToken");
-  const familyToken = await upgrades.deployProxy(FamilyToken, [
+  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
+  const governanceToken = await upgrades.deployProxy(GovernanceToken, [
     verifyVoucher.address,
   ]);
   const TimeLock = await ethers.getContractFactory("TimeLock");
@@ -31,7 +31,7 @@ const deployGovernorContract: DeployFunction = async function (
   log("Deploying GovernorContract ...");
   const GovernorContract = await ethers.getContractFactory("GovernorContract");
   const governorContract = await upgrades.deployProxy(GovernorContract, [
-    familyToken.address,
+    governanceToken.address,
     timeLock.address,
     VOTING_DELAY,
     VOTING_PERIOD,

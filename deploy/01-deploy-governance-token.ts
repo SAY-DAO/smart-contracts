@@ -17,8 +17,8 @@ const deployGovernanceToken: DeployFunction = async function (
   const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
   const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
 
-  const FamilyToken = await ethers.getContractFactory("FamilyToken");
-  const familyToken = await upgrades.deployProxy(FamilyToken, [
+  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
+  const governanceToken = await upgrades.deployProxy(GovernanceToken, [
     verifyVoucher.address,
   ]);
 
@@ -27,13 +27,13 @@ const deployGovernanceToken: DeployFunction = async function (
     process.env.ETHERSCAN_API_KEY
   ) {
     await verify(
-      familyToken.address,
+      governanceToken.address,
       [],
-      "contracts/FamilyToken.sol:FamilyToken"
+      "contracts/GovernanceToken.sol:GovernanceToken"
     );
   }
-  log(`FamilyToken deployed at: ${familyToken.address}`);
+  log(`GovernanceToken deployed at: ${governanceToken.address}`);
 };
 
 export default deployGovernanceToken;
-deployGovernanceToken.tags = ["all", "FamilyToken"];
+deployGovernanceToken.tags = ["all", "GovernanceToken"];

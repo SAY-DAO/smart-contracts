@@ -22,7 +22,7 @@ contract Treasury is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
         __AccessControl_init();
         __UUPSUpgradeable_init();
         _grantRole(TIME_LOCK_ROLE, timeLock);
-        // _grantRole(DEFAULT_ADMIN_ROLE, timeLock);
+        _grantRole(DEFAULT_ADMIN_ROLE, timeLock);
         needRatio = ratio;
     }
 

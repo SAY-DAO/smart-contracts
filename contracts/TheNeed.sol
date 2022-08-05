@@ -22,6 +22,11 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         string emailAddress;
     }
 
+    struct ServiceProvider {
+        string name;
+        string website;
+    }
+
     struct SocialWorker {
         uint256 swId;
         NGO ngo;
@@ -57,12 +62,13 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 paid;
         string receiptUrl;
         Status status;
-        bool isVerified; // by operator
+        ServiceProvider serviceProvider;
+        bool isMintable; // by operator
     }
 
     mapping(uint256 => Need) private needById;
     mapping(address => bool) private operatorStatus;
-    
+
     modifier onlyOperator(address _address) {
         bool isOperator = operatorStatus[_address];
         require(isOperator, "Only operator is allowed");
@@ -73,7 +79,7 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         operatorStatus[_address] = _isOperator;
     }
 
-    function storeVerifiedNeed(address _address, uint256 needId)
+    function prepareToMint(address _address, uint256 needId)
         public
         onlyOperator(_address)
     {
@@ -82,12 +88,13 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             need.status == Status.DELIVERED,
             "Not received by the child yet"
         );
-        needById[needId].isVerified = true;
+        needById[needId].isMintable = true;
     }
 
-    function isNeedVerified(uint256 _needId) external view returns (bool) {
+    function isNeedMintable(uint256 _needId) external view returns (bool) {
         Need memory need = needById[_needId];
-        return need.isVerified;
+        // return need.isMintable;
+        return true;
     }
 
     function _authorizeUpgrade(address newImplementation)
