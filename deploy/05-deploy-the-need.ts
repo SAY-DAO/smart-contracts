@@ -9,7 +9,7 @@ import {
 import { ethers, upgrades } from "hardhat";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
-const deployTreasury: DeployFunction = async function (
+const deployTheNeed: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ) {
   // @ts-ignore
@@ -17,52 +17,48 @@ const deployTreasury: DeployFunction = async function (
   const { log } = deployments;
 
   log(
-    "------------------------- Treasury Deployment ---------------------------"
+    "------------------------- TheNeed Deployment ---------------------------"
   );
-  log("Deploying Treasury ...");
+  log("Deploying TheNeed ...");
 
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
 
-  const Treasury = await ethers.getContractFactory("Treasury");
-  const treasury = await upgrades.deployProxy(Treasury, [
-    timeLock.address,
-    NEED_RATIO,
+  const TheNeed = await ethers.getContractFactory("TheNeed");
+  const theNeed = await upgrades.deployProxy(TheNeed, [
+    [NEED_RATIO, timeLock.address],
   ]);
 
-  log(`Treasury deployed at at ${treasury.address}`);
+  log(`TheNeed deployed at at ${theNeed.address}`);
   if (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY
   ) {
     await verify(
-      treasury.address,
-      [NEED_RATIO],
-      "contracts/Treasury.sol:Treasury"
+      theNeed.address,
+      [NEED_RATIO, timeLock.address],
+      "contracts/TheNeed.sol:TheNeed"
     );
   }
-  const treasuryContract = await ethers.getContractAt(
-    "Treasury",
-    treasury.address
-  );
 
   const TIME_LOCK_ROLE = keccak256(toUtf8Bytes("TIME_LOCK_ROLE"));
-  const isTimeLockOwner = await treasuryContract.hasRole(
+  const isTimeLockOwner = await theNeed.hasRole(
     TIME_LOCK_ROLE,
     timeLock.address
   );
+
   if (!isTimeLockOwner) {
-    const transferTx = await treasuryContract.grantRole(
+    const transferTx = await theNeed.grantRole(
       TIME_LOCK_ROLE,
       timeLock.address
     );
-    log(`Transfered ownership`);
+    log(`Transferred ownership`);
     log(transferTx);
 
     await transferTx.wait(1);
   }
-  log(`Treasury NOW is owned and governed by TimeLock: ${timeLock.address}`);
+  log(`TheNeed NOW is owned and governed by TimeLock: ${timeLock.address}`);
 };
 
-export default deployTreasury;
-deployTreasury.tags = ["all", "treasury"];
+export default deployTheNeed;
+deployTheNeed.tags = ["all", "theNeed"];

@@ -1,20 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract TheNeed is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
+    bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+    bytes32 public constant TIME_LOCK = keccak256("TIME_LOCK");
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
-    function initialize() public initializer {
-        __Ownable_init();
+    function initialize(string memory ratio, address timeLock)
+        public
+        initializer
+    {
         __UUPSUpgradeable_init();
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(TIME_LOCK, timeLock);
+
+        needRatio = ratio;
     }
+
+    string private needRatio;
 
     struct NGO {
         uint256 ngoId;
@@ -69,19 +81,16 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     mapping(uint256 => Need) private needById;
     mapping(address => bool) private operatorStatus;
 
-    modifier onlyOperator(address _address) {
-        bool isOperator = operatorStatus[_address];
-        require(isOperator, "Only operator is allowed");
-        _;
-    }
-
-    function setOperator(address _address, bool _isOperator) public onlyOwner {
+    function setOperator(address _address, bool _isOperator)
+        public
+        onlyRole(UPGRADER_ROLE)
+    {
         operatorStatus[_address] = _isOperator;
     }
 
     function prepareToMint(address _address, uint256 needId)
         public
-        onlyOperator(_address)
+        onlyRole(UPGRADER_ROLE)
     {
         Need memory need = needById[needId];
         require(
@@ -97,9 +106,20 @@ contract TheNeed is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         return true;
     }
 
+    function updateNeedRatio(string memory newRatio)
+        public
+        onlyRole(TIME_LOCK)
+    {
+        needRatio = newRatio;
+    }
+
+    function fetchNeedRatio() public view virtual returns (string memory) {
+        return (needRatio);
+    }
+
     function _authorizeUpgrade(address newImplementation)
         internal
         override
-        onlyOwner
+        onlyRole(UPGRADER_ROLE)
     {}
 }

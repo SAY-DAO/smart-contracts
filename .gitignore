@@ -4,6 +4,7 @@ yarn.lock
 .env
 coverage
 coverage.json
+.vscode
 
 #Hardhat files
 cache
