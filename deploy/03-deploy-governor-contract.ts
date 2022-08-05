@@ -7,6 +7,7 @@ import {
   VOTING_DELAY,
   VOTING_THRESHOLD,
   MIN_DELAY,
+  ADDRESS_ZERO,
 } from "../helpers/helper-hardhat-config";
 import { ethers, upgrades } from "hardhat";
 
@@ -24,8 +25,10 @@ const deployGovernorContract: DeployFunction = async function (
 
   const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
   const governanceToken = await upgrades.deployProxy(GovernanceToken, [
+    ADDRESS_ZERO,
     verifyVoucher.address,
   ]);
+
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
   log("Deploying GovernorContract ...");

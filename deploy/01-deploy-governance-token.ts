@@ -2,7 +2,10 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers, upgrades } from "hardhat";
 import verify from "../helper-functions";
-import { developmentChains } from "../helpers/helper-hardhat-config";
+import {
+  ADDRESS_ZERO,
+  developmentChains,
+} from "../helpers/helper-hardhat-config";
 
 // Deployment
 const deployGovernanceToken: DeployFunction = async function (
@@ -19,6 +22,7 @@ const deployGovernanceToken: DeployFunction = async function (
 
   const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
   const governanceToken = await upgrades.deployProxy(GovernanceToken, [
+    ADDRESS_ZERO,
     verifyVoucher.address,
   ]);
 

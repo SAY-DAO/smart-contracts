@@ -26,7 +26,8 @@ const deployTheNeed: DeployFunction = async function (
 
   const TheNeed = await ethers.getContractFactory("TheNeed");
   const theNeed = await upgrades.deployProxy(TheNeed, [
-    [NEED_RATIO, timeLock.address],
+    NEED_RATIO,
+    timeLock.address,
   ]);
 
   log(`TheNeed deployed at at ${theNeed.address}`);
@@ -53,7 +54,6 @@ const deployTheNeed: DeployFunction = async function (
       timeLock.address
     );
     log(`Transferred ownership`);
-    log(transferTx);
 
     await transferTx.wait(1);
   }

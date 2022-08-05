@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract TheNeed is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
-    bytes32 public constant TIME_LOCK = keccak256("TIME_LOCK");
+    bytes32 public constant TIME_LOCK_ROLE = keccak256("TIME_LOCK_ROLE");
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -21,7 +21,8 @@ contract TheNeed is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     {
         __UUPSUpgradeable_init();
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(TIME_LOCK, timeLock);
+        _grantRole(UPGRADER_ROLE, msg.sender);
+        _grantRole(TIME_LOCK_ROLE, timeLock);
 
         needRatio = ratio;
     }
@@ -108,7 +109,7 @@ contract TheNeed is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
 
     function updateNeedRatio(string memory newRatio)
         public
-        onlyRole(TIME_LOCK)
+        onlyRole(TIME_LOCK_ROLE)
     {
         needRatio = newRatio;
     }
