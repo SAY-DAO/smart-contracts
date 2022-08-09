@@ -1,30 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/draft-ERC721VotesUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
-
-struct Voucher {
-    uint256 needId;
-    uint256 mintValue;
-    string tokenUri;
-    string content;
-    bytes signature;
-}
-
-interface InterfaceTheNeed {
-    function isNeedMintable(uint256 _needId) external returns (bool);
-}
-
-interface InterfaceVoucher {
-    function _verify(Voucher calldata voucher) external view returns (address);
-}
+import "../../interfaces/ITheNeed.sol";
 
 contract GovernanceToken is
     Initializable,
@@ -32,7 +16,6 @@ contract GovernanceToken is
     AccessControlUpgradeable,
     EIP712Upgradeable,
     ERC721VotesUpgradeable,
-    ERC721URIStorageUpgradeable,
     UUPSUpgradeable
 {
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
@@ -74,7 +57,7 @@ contract GovernanceToken is
 
     // Collabration between a virtual family memebr and a friend
     modifier verifier(uint256 _needId, address _needContract) {
-        InterfaceTheNeed n = InterfaceTheNeed(_needContract);
+        ITheNeed n = ITheNeed(_needContract);
         bool isMintable = n.isNeedMintable(_needId);
         if (isMintable) {
             _;
@@ -103,18 +86,15 @@ contract GovernanceToken is
             _voucher.mintValue <= msg.value,
             "You must pay the voucher value"
         );
-
         // 1 gSay for the family member
         _tokenIdCounter.increment();
         uint256 tokenId = _tokenIdCounter.current();
         _safeMint(familyMember, tokenId);
-        _setTokenURI(tokenId, _voucher.tokenUri);
 
         // 1 gSay for the minter the friend
         _tokenIdCounter.increment();
         uint256 tokenId2 = _tokenIdCounter.current();
         _safeMint(msg.sender, tokenId2);
-        _setTokenURI(tokenId, _voucher.tokenUri);
         // TODO: transfer the value to the treasury?
 
         emit Minted(
@@ -129,39 +109,19 @@ contract GovernanceToken is
     function safeSocialWorkerMint() public payable {
         _tokenIdCounter.increment();
         uint256 tokenId = _tokenIdCounter.current();
-        _setTokenURI(tokenId, "Uri");
     }
 
-    function _burn(uint256 tokenId)
-        internal
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
-    {
+    function _burn(uint256 tokenId) internal override(ERC721Upgradeable) {
         super._burn(tokenId);
     }
 
     function tokenURI(uint256 tokenId)
         public
         view
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
+        override(ERC721Upgradeable)
         returns (string memory)
     {
         return super.tokenURI(tokenId);
-    }
-
-    function grantRole(bytes32 role, address account)
-        public
-        override
-        onlyRole(SAY_ADMIN_ROLE)
-    {
-        super._grantRole(role, account);
-    }
-
-    function revokeRole(bytes32 role, address account)
-        public
-        override
-        onlyRole(SAY_ADMIN_ROLE)
-    {
-        super._revokeRole(role, account);
     }
 
     function _authorizeUpgrade(address newImplementation)

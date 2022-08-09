@@ -1,3 +1,5 @@
+import path from "path";
+import fs from "fs";
 import "@typechain/hardhat";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
@@ -7,44 +9,71 @@ import "dotenv/config";
 import "solidity-coverage";
 import "hardhat-deploy";
 import "@openzeppelin/hardhat-upgrades";
+import { eEthereumNetwork } from "./helpers/types";
 
 import { HardhatUserConfig } from "hardhat/config";
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
-const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "";
-const KOVAN_RPC_URL = process.env.KOVAN_RPC_URL || "";
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+const ALCHEMY_KEY = process.env.ALCHEMY_KEY || "";
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+
+const DEFAULT_BLOCK_GAS_LIMIT = 12450000;
+const DEFAULT_GAS_PRICE = 10;
+const HARDFORK = "istanbul";
+
+const getCommonNetworkConfig = (
+  networkName: eEthereumNetwork,
+  networkId: number
+) => {
+  return {
+    url: `https://eth-${networkName}.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    hardfork: HARDFORK,
+    blockGasLimit: DEFAULT_BLOCK_GAS_LIMIT,
+    gasMultiplier: DEFAULT_GAS_PRICE,
+    chainId: networkId,
+    accounts: [PRIVATE_KEY],
+  };
+};
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
       chainId: 31337,
-      allowUnlimitedContractSize: true,
+      blockGasLimit: DEFAULT_BLOCK_GAS_LIMIT,
+      gas: DEFAULT_BLOCK_GAS_LIMIT,
+      gasPrice: 8000000000,
+      throwOnTransactionFailures: true,
+      throwOnCallFailures: true,
     },
     localhost: {
       chainId: 31337, // the hardhat node
     },
-    rinkeby: {
-      url: RINKEBY_RPC_URL,
-      accounts: [PRIVATE_KEY],
-      chainId: 4,
-    },
-    kovan: {
-      url: KOVAN_RPC_URL,
-      accounts: [PRIVATE_KEY],
-      chainId: 42,
-    },
+    rinkeby: getCommonNetworkConfig(eEthereumNetwork.rinkeby, 4),
+    goerli: getCommonNetworkConfig(eEthereumNetwork.goerli, 5),
   },
   solidity: {
-    version: "0.8.9",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 1000,
+    compilers: [
+      {
+        version: "0.8.9",
+        settings: {
+          optimizer: { enabled: true, runs: 200 },
+        },
       },
-    },
+      {
+        version: "0.8.4",
+        settings: {
+          optimizer: { enabled: true, runs: 200 },
+        },
+      },
+      {
+        version: "0.8.2",
+        settings: {
+          optimizer: { enabled: true, runs: 200 },
+        },
+      },
+    ],
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
@@ -63,7 +92,7 @@ const config: HardhatUserConfig = {
     },
   },
   mocha: {
-    timeout: 200000, // 200 seconds max for running tests
+    timeout: 2000, // 200 seconds max for running tests
   },
 };
 

@@ -42,6 +42,7 @@ const deployGovernorContract: DeployFunction = async function (
   ]);
 
   log(`GovernorContract deployed at: ${governorContract.address}`);
+  
 };
 
 export default deployGovernorContract;

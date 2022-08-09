@@ -8,6 +8,7 @@ import {
 } from "../helpers/helper-hardhat-config";
 import { ethers, upgrades } from "hardhat";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
+import { getImplementationAddress } from "@openzeppelin/upgrades-core";
 
 const deployTheNeed: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
@@ -31,14 +32,20 @@ const deployTheNeed: DeployFunction = async function (
   ]);
 
   log(`TheNeed deployed at at ${theNeed.address}`);
+
+  const currentImplAddress = await getImplementationAddress(
+    ethers.provider,
+    theNeed.address
+  );
+
   if (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY
   ) {
     await verify(
-      theNeed.address,
-      [NEED_RATIO, timeLock.address],
-      "contracts/TheNeed.sol:TheNeed"
+      currentImplAddress,
+      [],
+     "contracts/needModule/TheNeed.sol:TheNeed"
     );
   }
 

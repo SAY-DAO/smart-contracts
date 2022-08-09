@@ -89,18 +89,7 @@ contract TheNeed is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
         operatorStatus[_address] = _isOperator;
     }
 
-    // after delivery service/produxt to child , an Oracle will update the need to be minted
-    function prepareToMint(uint256 needId) public onlyRole(UPGRADER_ROLE) {
-        Need memory need = needById[needId];
-        require(
-            need.status == Status.DELIVERED,
-            "Not received by the child yet"
-        );
-        needById[needId].isMintable = true;
-    }
-
-    function isNeedMintable(uint256 _needId) external view returns (bool) {
-        Need memory need = needById[_needId];
+    function isNeedMintable(uint256 _needId) external pure returns (bool) {
         // return need.isMintable;
         return true;
     }

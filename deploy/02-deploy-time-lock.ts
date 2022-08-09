@@ -3,6 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import verify from "../helpers/helper-functions";
 import { developmentChains, MIN_DELAY } from "../helpers/helper-hardhat-config";
 import { ethers, upgrades } from "hardhat";
+import { getImplementationAddress } from "@openzeppelin/upgrades-core";
 
 const deployTimeLock: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
@@ -17,17 +18,23 @@ const deployTimeLock: DeployFunction = async function (
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
 
+  log(`TimeLock deployed at: ${timeLock.address}`);
+
+  const currentImplAddress = await getImplementationAddress(
+    ethers.provider,
+    timeLock.address
+  );
+
   if (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY
   ) {
     await verify(
-      timeLock.address,
-      [MIN_DELAY, [], []],
-      "contracts/standards/TimeLock.sol:TimeLock"
+      currentImplAddress,
+      [],
+      "contracts/governance/TmeLock.sol:TimeLock"
     );
   }
-  log(`TimeLock deployed at: ${timeLock.address}`);
 };
 export default deployTimeLock;
 deployTimeLock.tags = ["all", "timelock"];

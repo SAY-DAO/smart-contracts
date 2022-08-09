@@ -322,6 +322,12 @@ describe("Deployment", function () {
       .connect(sayAdmin) // only say admin
       .setVoucherVerifier("0x0000000000000000000000000000000000000001");
 
+    await expect(
+      governanceTokenV2.setVoucherVerifier(
+        "0x0000000000000000000000000000000000000002"
+      )
+    ).to.be.reverted;
+
     expect(await governanceToken.voucherAddress()).to.equal(
       "0x0000000000000000000000000000000000000001"
     );
