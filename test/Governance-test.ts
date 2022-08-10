@@ -44,8 +44,8 @@ async function deployLockFixture() {
     QUORUM_PERCENTAGE,
   ]);
 
-  const TheNeed = await ethers.getContractFactory("TheNeed");
-  const theNeed = await upgrades.deployProxy(TheNeed, [
+  const Need = await ethers.getContractFactory("Need");
+  const theNeed = await upgrades.deployProxy(Need, [
     NEED_RATIO,
     timeLock.address,
   ]);

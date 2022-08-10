@@ -17,21 +17,19 @@ const deployTheNeed: DeployFunction = async function (
   const { deployments, network } = hre;
   const { log } = deployments;
 
-  log(
-    "------------------------- TheNeed Deployment ---------------------------"
-  );
-  log("Deploying TheNeed ...");
+  log("------------------------- Need Deployment ---------------------------");
+  log("Deploying Need ...");
 
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
 
-  const TheNeed = await ethers.getContractFactory("TheNeed");
-  const theNeed = await upgrades.deployProxy(TheNeed, [
+  const Need = await ethers.getContractFactory("Need");
+  const theNeed = await upgrades.deployProxy(Need, [
     NEED_RATIO,
     timeLock.address,
   ]);
 
-  log(`TheNeed deployed at at ${theNeed.address}`);
+  log(`Need deployed at at ${theNeed.address}`);
 
   const currentImplAddress = await getImplementationAddress(
     ethers.provider,
@@ -42,11 +40,7 @@ const deployTheNeed: DeployFunction = async function (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY
   ) {
-    await verify(
-      currentImplAddress,
-      [],
-     "contracts/needModule/TheNeed.sol:TheNeed"
-    );
+    await verify(currentImplAddress, [], "contracts/needModule/Need.sol:Need");
   }
 
   const TIME_LOCK_ROLE = keccak256(toUtf8Bytes("TIME_LOCK_ROLE"));
@@ -64,7 +58,7 @@ const deployTheNeed: DeployFunction = async function (
 
     await transferTx.wait(1);
   }
-  log(`TheNeed NOW is owned and governed by TimeLock: ${timeLock.address}`);
+  log(`Need NOW is owned and governed by TimeLock: ${timeLock.address}`);
 };
 
 export default deployTheNeed;
