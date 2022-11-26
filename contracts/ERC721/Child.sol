@@ -38,17 +38,7 @@ contract Child is
         _setTokenURI(tokenId, uri);
     }
 
-    struct TheChild {
-        string SayName;
-        uint8 age;
-        string country;
-        string city;
-        address[] family;
-        address childNFT;
-        address ngoNFT;
-    }
 
-    mapping(address => TheChild) private ChildByToken;
 
     function _authorizeUpgrade(address newImplementation)
         internal

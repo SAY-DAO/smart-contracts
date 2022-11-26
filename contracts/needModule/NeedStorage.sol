@@ -4,10 +4,31 @@ pragma solidity ^0.8.4;
 contract NeedStorage {
     string public needRatio;
 
+    struct Need {
+        uint256 needId;
+        uint256 paid;
+        NGO ngo;
+        SocialWorker socialWorker;
+        TheChild child;
+        FamilyMember[] contributors;
+        ServiceProvider serviceProvider;
+        Status status;
+        string[] receipts;
+    }
+
+    /// @dev FamilyMemberSignature: From a Family member signing a transaction using the signature from social worker and need data
+    struct Voucher {
+        Need need;
+        address familyMember;
+        address socialWorker;
+        bytes FamilyMemberSignature;
+        string content;
+    }
+
     struct NGO {
         uint256 ngoId;
         string name;
-        string emailAddress;
+        string contact;
     }
 
     struct ServiceProvider {
@@ -21,12 +42,14 @@ contract NeedStorage {
         address wallet;
     }
 
-    struct Child {
+    struct TheChild {
         uint256 childId;
-        string childSayName;
-        string voiceUrl;
-        string avatarUrl;
+        string SayName;
+        uint8 age;
         string country;
+        string city;
+        string voiceIpfsHash;
+        string avatarIpfsHash;
     }
 
     struct FamilyMember {
@@ -41,18 +64,8 @@ contract NeedStorage {
         AUDITED
     }
 
-    struct Need {
-        uint256 _needId;
-        NGO ngo;
-        SocialWorker socialWorker;
-        Child child;
-        FamilyMember[] contributors;
-        uint256 paid;
-        string receiptUrl;
-        Status status;
-        ServiceProvider serviceProvider;
-        bool isMintable; // by operator
-    }
+ 
+    mapping(address => TheChild) private ChildByToken;
 
     mapping(uint256 => Need) private needById;
 }

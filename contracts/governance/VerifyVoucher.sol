@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
 import "contracts/utils/ECDSA.sol";
+import "contracts/needModule/NeedStorage.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
@@ -23,19 +24,9 @@ contract VerifyVoucher is
         __EIP712_init(SIGNING_DOMAIN, SIGNATURE_VERSION);
     }
 
-    struct Voucher {
-        uint256 needId;
-        uint256 mintAmount;
-        string tokenUri;
-        string content;
-        address familyMember;
-        address socialWorker;
-        bytes signature;
-    }
-
     event FallingBack(string msg);
 
-    function _hash(Voucher calldata _voucher) internal view returns (bytes32) {
+    function _hash(NeedStorage.Voucher calldata _voucher) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
                 keccak256(
