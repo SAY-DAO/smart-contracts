@@ -12,14 +12,18 @@ const setupContracts: DeployFunction = async function (
   log(
     "------------------------- Grant / Revoke Roles ---------------------------"
   );
-
+console.log('1')
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
-
+  await timeLock.deployed();
+  await timeLock.wait;
+console.log('2')
+  
   // TO-DO: multicall
   const proposer = await timeLock.PROPOSER_ROLE();
   const executor = await timeLock.EXECUTOR_ROLE();
   const admin = await timeLock.TIMELOCK_ADMIN_ROLE();
+  console.log('3')
 
   const isProposer = await timeLock.hasRole(proposer, timeLock.address);
   const isExecutor = await timeLock.hasRole(executor, ADDRESS_ZERO);

@@ -24,6 +24,7 @@ contract TimeLock is
         __TimelockController_init(minDelay, proposers, executors);
         __Ownable_init();
         __UUPSUpgradeable_init();
+        
     }
 
     function _authorizeUpgrade(address newImplementation)

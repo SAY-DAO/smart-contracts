@@ -21,15 +21,22 @@ const deployGovernorContract: DeployFunction = async function (
   );
   const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
   const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
+  await verifyVoucher.deployed();
+  await verifyVoucher.wait;
 
   const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
   const governanceToken = await upgrades.deployProxy(GovernanceToken, [
     ADDRESS_ZERO,
     verifyVoucher.address,
   ]);
+  await governanceToken.deployed();
+  await governanceToken.wait;
 
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
+  await timeLock.deployed();
+  await timeLock.wait;
+  
   log("Deploying GovernorContract ...");
   const GovernorContract = await ethers.getContractFactory("GovernorContract");
   const governorContract = await upgrades.deployProxy(GovernorContract, [
@@ -40,9 +47,12 @@ const deployGovernorContract: DeployFunction = async function (
     VOTING_THRESHOLD,
     QUORUM_PERCENTAGE,
   ]);
+  await governorContract.deployed();
+  await governorContract.wait;
 
   log(`GovernorContract deployed at: ${governorContract.address}`);
-  
+  const blockNumBefore = await ethers.provider.getBlockNumber();
+  log(`BlockNumBeforeat: ${blockNumBefore}`);
 };
 
 export default deployGovernorContract;

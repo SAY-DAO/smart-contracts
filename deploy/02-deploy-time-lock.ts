@@ -17,7 +17,9 @@ const deployTimeLock: DeployFunction = async function (
   log("Deploying TimeLock ...");
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
-
+  await timeLock.deployed();
+  await timeLock.wait;
+  
   log(`TimeLock deployed at: ${timeLock.address}`);
 
   const currentImplAddress = await getImplementationAddress(
@@ -32,7 +34,7 @@ const deployTimeLock: DeployFunction = async function (
     await verify(
       currentImplAddress,
       [],
-      "contracts/governance/TmeLock.sol:TimeLock"
+      "contracts/governance/TimeLock.sol:TimeLock"
     );
   }
 };

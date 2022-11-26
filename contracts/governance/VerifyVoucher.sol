@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "contracts/utils/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
@@ -25,9 +25,11 @@ contract VerifyVoucher is
 
     struct Voucher {
         uint256 needId;
-        uint256 mintValue;
+        uint256 mintAmount;
         string tokenUri;
         string content;
+        address familyMember;
+        address socialWorker;
         bytes signature;
     }
 
@@ -39,10 +41,10 @@ contract VerifyVoucher is
                 keccak256(
                     abi.encode(
                         keccak256(
-                            "Voucher(uint256 needId,uint256 mintValue,string tokenUri,string content)"
+                            "Voucher(uint256 needId,uint256 mintAmount,string tokenUri,string content)"
                         ),
                         _voucher.needId,
-                        _voucher.mintValue,
+                        _voucher.mintAmount,
                         keccak256(bytes(_voucher.tokenUri)),
                         keccak256(bytes(_voucher.content))
                     )
@@ -51,12 +53,9 @@ contract VerifyVoucher is
     }
 
     // returns signer address
-    function _verify(Voucher calldata _voucher)
-        public
-        view
-        virtual
-        returns (address)
-    {
+    function _verify(
+        Voucher calldata _voucher
+    ) public view virtual returns (address) {
         bytes32 digest = _hash(_voucher);
         return ECDSA.recover(digest, _voucher.signature);
     }
@@ -70,11 +69,9 @@ contract VerifyVoucher is
         return id;
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 
     fallback() external {
         emit FallingBack("Store Fall Back");

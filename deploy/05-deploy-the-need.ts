@@ -22,12 +22,17 @@ const deployTheNeed: DeployFunction = async function (
 
   const TimeLock = await ethers.getContractFactory("TimeLock");
   const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
-
+  await timeLock.deployed();
+  await timeLock.wait;
+  
   const Need = await ethers.getContractFactory("Need");
   const theNeed = await upgrades.deployProxy(Need, [
     NEED_RATIO,
     timeLock.address,
   ]);
+  await theNeed.deployed();
+  await theNeed.wait;
+  
 
   log(`Need deployed at at ${theNeed.address}`);
 

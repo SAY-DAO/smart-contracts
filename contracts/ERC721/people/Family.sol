@@ -33,17 +33,17 @@ contract Family is
         __UUPSUpgradeable_init();
     }
 
-    /**
-     * @dev Get the `pos`-th checkpoint for `account`.
-     */
-    function checkpoints(address account, uint32 pos)
-        public
-        view
-        virtual
-        returns (CheckPoints.Checkpoint memory)
-    {
-        return CheckPoints.History[_checkpoints][account][pos];
-    }
+    // /**
+    //  * @dev Get the `pos`-th checkpoint for `account`.
+    //  */
+    // function checkpoints(address account, uint32 pos)
+    //     public
+    //     view
+    //     virtual
+    //     returns (CheckPoints.Checkpoint memory)
+    // {
+    //     return CheckPoints.History[_checkpoints][account][pos];
+    // }
 
     function safeMint(address to, string memory uri) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
@@ -66,22 +66,22 @@ contract Family is
         bytes32 role
     ) external virtual returns (uint256) {}
 
-    function relationShip(
-        address member,
-        bytes32 role,
-        address childContractAddress,
-        address childNFT
-    ) public returns (uint256) {
-        Child childContract = Child(childContractAddress);
-        bool isFamily = childContract.verifyFamily(member, childNFT);
-        require(isFamily, "You are not related");
-        uint256 impactVariable = childContract.calculateFamilyImpact(
-            member,
-            childNFT,
-            role
-        );
-        return impactVariable;
-    }
+    // function relationShip(
+    //     address member,
+    //     bytes32 role,
+    //     address childContractAddress,
+    //     address childNFT
+    // ) public returns (uint256) {
+    //     Child childContract = Child(childContractAddress);
+    //     // bool isFamily = childContract.verifyFamily(member, childNFT);
+    //     // require(isFamily, "You are not related");
+    //     uint256 impactVariable = childContract.calculateFamilyImpact(
+    //         member,
+    //         childNFT,
+    //         role
+    //     );
+    //     return impactVariable;
+    // }
 
     function _authorizeUpgrade(address newImplementation)
         internal

@@ -1,5 +1,3 @@
-import path from "path";
-import fs from "fs";
 import "@typechain/hardhat";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";

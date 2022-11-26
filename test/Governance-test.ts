@@ -69,11 +69,11 @@ async function signTransaction(
   // Contracts are deployed using the first signer/account by default
   const [owner, familyMember, friend] = await ethers.getSigners();
   const friendContract = governanceToken.connect(friend);
-  const mintValue = ethers.utils.parseUnits("0.054", "ether");
+  const mintAmount = ethers.utils.parseUnits("0.054", "ether");
   const voucher = new Voucher();
   const { ...theVoucher } = await voucher.signTransaction({
     needId: 13,
-    mintValue: mintValue,
+    mintAmount: mintAmount,
     tokenUri: "nothing",
     signer: familyMember,
     contract: verifyVoucher,
@@ -84,7 +84,7 @@ async function signTransaction(
     friend,
     verifyVoucher,
     friendContract,
-    mintValue,
+    mintAmount,
     theVoucher,
   };
 }
@@ -166,12 +166,12 @@ describe("Deployment", function () {
       await loadFixture(deployLockFixture);
 
     // sign & mint
-    const { familyMember, friend, friendContract, mintValue, theVoucher } =
+    const { familyMember, friend, friendContract, mintAmount, theVoucher } =
       await signTransaction(governanceToken, verifyVoucher);
 
     expect(
       await friendContract.safeFamilyMint(13, theNeed.address, theVoucher, {
-        value: mintValue,
+        value: mintAmount,
       })
     )
       .to.emit(governanceToken, "Minted")
@@ -205,11 +205,11 @@ describe("Deployment", function () {
     } = await loadFixture(deployLockFixture);
 
     // sign & mint
-    const { familyMember, friend, friendContract, mintValue, theVoucher } =
+    const { familyMember, friend, friendContract, mintAmount, theVoucher } =
       await signTransaction(governanceToken, verifyVoucher);
 
     await friendContract.safeFamilyMint(13, theNeed.address, theVoucher, {
-      value: mintValue,
+      value: mintAmount,
     });
 
     console.log("Proposing...");

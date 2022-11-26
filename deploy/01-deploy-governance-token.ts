@@ -19,24 +19,24 @@ const deployGovernanceToken: DeployFunction = async function (
     "------------------------- GovernanceToken Deployment ---------------------------"
   );
   const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
-  console.log("0");
   const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
-  // for a live network to verify properly
-  console.log("1");
   await verifyVoucher.deployed();
-  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
-  console.log("2");
+  await verifyVoucher.wait;
+  log(`VerifyVoucher deployed at: ${verifyVoucher.address}`);
 
+  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
   const governanceToken = await upgrades.deployProxy(GovernanceToken, [
     ADDRESS_ZERO,
     verifyVoucher.address,
   ]);
-  console.log("3");
-
   await governanceToken.deployed();
   await governanceToken.wait;
 
+  console.log("2");
+
   log(`GovernanceToken deployed at: ${governanceToken.address}`);
+  const blockNumBefore = await ethers.provider.getBlockNumber();
+  log(`BlockNumBeforeat: ${blockNumBefore}`);
 
   const currentImplAddress = await getImplementationAddress(
     ethers.provider,

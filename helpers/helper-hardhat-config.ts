@@ -12,8 +12,11 @@ export const networkConfig: networkConfigInfo = {
   hardhat: {},
   // Price Feed Address, values can be obtained at https://docs.chain.link/docs/reference-contracts
   // Default one is ETH/USD contract on Kovan
-  rinkeby: {
-    blockConfirmations: 3,
+  rokenby: {
+    blockConfirmations: 1,
+  },
+  goerli: {
+    blockConfirmations: 1,
   },
 };
 
@@ -36,3 +39,6 @@ export const PROPOSAL_DESCRIPTION = "Proposal #1 Changed Need_Ratio to 0.7!";
 // 0 = Against, 1 = For, 2 = Abstain
 export const SUPPORT = 1;
 export const REASON = "my reasons!";
+
+export const SIGNING_DOMAIN_NAME = 'SAY-DAO';
+export const SIGNING_DOMAIN_VERSION = '1';

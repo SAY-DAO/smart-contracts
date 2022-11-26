@@ -12,7 +12,7 @@ interface DomainData {
 }
 
 class Voucher {
-  constructor() {}
+  constructor() { }
 
   async designDomain(contract: Contract) {
     let domainData: DomainData;
@@ -29,13 +29,13 @@ class Voucher {
 
   async signTransaction({
     needId,
-    mintValue,
+    mintAmount,
     tokenUri,
     contract,
     signer,
   }: {
     needId: number;
-    mintValue: BigNumber;
+    mintAmount: BigNumber;
     tokenUri: string;
     contract: Contract;
     signer: SignerWithAddress;
@@ -45,7 +45,7 @@ class Voucher {
     const types = {
       Voucher: [
         { name: "needId", type: "uint256" },
-        { name: "mintValue", type: "uint256" },
+        { name: "mintAmount", type: "uint256" },
         { name: "tokenUri", type: "string" },
         { name: "content", type: "string" },
       ],
@@ -53,7 +53,7 @@ class Voucher {
 
     const voucher = {
       needId,
-      mintValue,
+      mintAmount,
       tokenUri,
       content: "You are authorizing this need to be minted by a friend!",
     };
