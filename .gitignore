@@ -5,6 +5,7 @@ yarn.lock
 coverage
 coverage.json
 .vscode
+.cspell
 
 #Hardhat files
 cache
