@@ -3,9 +3,9 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
-import "contracts/needModule/NeedStorage.sol";
+// import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+// import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "contracts/governance/VerifyVoucher.sol";
 
 contract GovernanceToken is ERC20, ERC20Burnable, ERC20Permit, ERC20Votes {
     constructor()
@@ -13,14 +13,20 @@ contract GovernanceToken is ERC20, ERC20Burnable, ERC20Permit, ERC20Votes {
         ERC20Permit("GovernanceToken")
     {}
 
+    modifier verifier(NeedStorage.Need need, NeedStorage.Voucher voucher) {
+        // KingVampire kv = KingVampire(kingVampireAddress);
+        require(need.needId == 1, "Only the owner can do this.");
+        _;
+    }
+
     // The following functions are overrides required by Solidity.
 
     function safeFamilyMint(
-        uint256 _needId,
+        NeedStorage.Need need,
         address _needContract,
-        Voucher calldata _voucher
-    ) public payable verifier(_needId, _needContract) {
-        InterfaceVoucher voucherInterface = InterfaceVoucher(voucherAddress);
+        NeedStorage.Voucher calldata voucher
+    ) public payable verifier(need, voucher) {
+        VerifyVoucher verifyVoucher = VerifyVoucher(voucherAddress);
         address familyMember = voucherInterface._verify(_voucher);
 
         require(

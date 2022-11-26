@@ -4,8 +4,8 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
 import "contracts/utils/ECDSA.sol";
-import "contracts/needModule/NeedStorage.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "contracts/needModule/NeedStorage.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
 string constant SIGNATURE_VERSION = "1";
@@ -26,7 +26,9 @@ contract VerifyVoucher is
 
     event FallingBack(string msg);
 
-    function _hash(NeedStorage.Voucher calldata _voucher) internal view returns (bytes32) {
+    function _hash(
+        NeedStorage.Voucher calldata _voucher
+    ) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
                 keccak256(
@@ -34,7 +36,7 @@ contract VerifyVoucher is
                         keccak256(
                             "Voucher(uint256 needId,uint256 mintAmount,string tokenUri,string content)"
                         ),
-                        _voucher.needId,
+                        _voucher.need.needId,
                         _voucher.mintAmount,
                         keccak256(bytes(_voucher.tokenUri)),
                         keccak256(bytes(_voucher.content))
@@ -45,7 +47,7 @@ contract VerifyVoucher is
 
     // returns signer address
     function _verify(
-        Voucher calldata _voucher
+        NeedStorage.Voucher calldata _voucher
     ) public view virtual returns (address) {
         bytes32 digest = _hash(_voucher);
         return ECDSA.recover(digest, _voucher.signature);

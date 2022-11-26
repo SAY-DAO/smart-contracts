@@ -7,12 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "contracts/needModule/NeedStorage.sol";
 
-contract Need is
-    NeedStorage,
-    Initializable,
-    AccessControlUpgradeable,
-    UUPSUpgradeable
-{
+contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant TIME_LOCK_ROLE = keccak256("TIME_LOCK_ROLE");
     mapping(address => bool) private operatorStatus;
@@ -23,27 +18,31 @@ contract Need is
     }
 
     function initialize(
-        string memory ratio,
+        address _needStorageAddress,
         address timeLock
     ) public initializer {
+        needStorageAddress = _needStorageAddress;
         __UUPSUpgradeable_init();
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
         _grantRole(TIME_LOCK_ROLE, timeLock);
-
-        needRatio = ratio;
+        needStorage = NeedStorage(needStorageAddress);
     }
+
+    address public needStorageAddress;
+    NeedStorage public needStorage;
 
     /// @dev Function updateNeedRatio
-    /// @param newRatio timeLock will update whenever necessary
-    function updateNeedRatio(
-        string memory newRatio
-    ) public onlyRole(TIME_LOCK_ROLE) {
-        needRatio = newRatio;
+    /// @param newRatio timeLock will update the target ratio whenever necessary
+    function updateNeedRatio(uint256 newRatio) public onlyRole(TIME_LOCK_ROLE) {
+        needStorage = NeedStorage(needStorageAddress);
+        needStorage._updateNeedRatio(newRatio);
     }
 
-    function fetchNeedRatio() public view virtual returns (string memory) {
-        return (needRatio);
+
+    /// @dev Function fetchNeedRatio - for current ratio
+    function fetchNeedRatio() public view virtual returns (uint256) {
+        return (needStorage.targetNeedRatio());
     }
 
     function _authorizeUpgrade(

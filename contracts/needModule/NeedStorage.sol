@@ -2,7 +2,8 @@
 pragma solidity ^0.8.4;
 
 contract NeedStorage {
-    string public needRatio;
+    uint256 public targetNeedRatio;
+    address public timeLockAddress;
 
     struct Need {
         uint256 needId;
@@ -16,12 +17,14 @@ contract NeedStorage {
         string[] receipts;
     }
 
-    /// @dev FamilyMemberSignature: From a Family member signing a transaction using the signature from social worker and need data
+    /// @dev signature: From a Family member signing a transaction using the existing signature from social worker and need data
     struct Voucher {
         Need need;
         address familyMember;
         address socialWorker;
-        bytes FamilyMemberSignature;
+        bytes signature;
+        uint256 mintAmount;
+        string tokenUri;
         string content;
     }
 
@@ -64,8 +67,18 @@ contract NeedStorage {
         AUDITED
     }
 
- 
     mapping(address => TheChild) private ChildByToken;
 
     mapping(uint256 => Need) private needById;
+
+    modifier onlyOwner() {
+        require(msg.sender == timeLockAddress, "Only the owner can do this.");
+        _;
+    }
+
+    /// @dev Function updateNeedRatio called from Need contract
+    /// @param newRatio timeLock will update whenever necessary
+    function _updateNeedRatio(uint256 newRatio) external onlyOwner {
+        targetNeedRatio = newRatio;
+    }
 }
