@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "contracts/needModule/NeedStorage.sol";
 import "contracts/interfaces/IVerifyVoucher.sol";
+import "contracts/governance/GovernanceToken.sol";
 
 contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
@@ -67,6 +68,15 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
             "You must pay the voucher value"
         );
 
+        // Send staking tokens back to staker
+        GovernanceToken token = GovernanceToken(tokenAddress);
+        require(
+            token.transfer(
+                msg.sender,
+                stakes[stakeID].amountDeposited
+            ),
+            "Unlock failed"
+        );
         emit Minted(
             voucher.need.needId,
             voucher.familyMember,
