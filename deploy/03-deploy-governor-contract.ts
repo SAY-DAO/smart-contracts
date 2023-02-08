@@ -7,48 +7,46 @@ import {
   VOTING_THRESHOLD,
   MIN_DELAY,
   ADDRESS_ZERO,
+  developmentChains,
+  networkConfig,
 } from "../helpers/helper-hardhat-config";
-import { ethers, upgrades } from "hardhat";
+import { ethers, getNamedAccounts, upgrades } from "hardhat";
+import verify from "../helpers/helper-functions";
+import fs from "fs";
 
 const deployGovernorContract: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ) {
-  const { deployments } = hre;
-  const { log } = deployments;
+  const { deployer } = await getNamedAccounts()
+  const { deployments, network } = hre;
+  const { log, deploy } = deployments;
 
   log(
     "------------------------- GovernorContract Deployment ---------------------------"
   );
-  const VerifyVoucher = await ethers.getContractFactory("VerifyVoucher");
-  const verifyVoucher = await upgrades.deployProxy(VerifyVoucher, []);
-  await verifyVoucher.deployed();
-  await verifyVoucher.wait;
+  log("Deploying GovernanceToken ...");
+  const governanceToken = await deploy('GovernanceToken', {
+    from: deployer,
+    args: [],
+    log: true,
+    waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
+  })
 
-  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
-  const governanceToken = await upgrades.deployProxy(GovernanceToken, [
-    ADDRESS_ZERO,
-    verifyVoucher.address,
-  ]);
-  await governanceToken.deployed();
-  await governanceToken.wait;
-
-  const TimeLock = await ethers.getContractFactory("TimeLock");
-  const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
-  await timeLock.deployed();
-  await timeLock.wait;
-  
   log("Deploying GovernorContract ...");
-  const GovernorContract = await ethers.getContractFactory("GovernorContract");
-  const governorContract = await upgrades.deployProxy(GovernorContract, [
-    governanceToken.address,
-    timeLock.address,
-    VOTING_DELAY,
-    VOTING_PERIOD,
-    VOTING_THRESHOLD,
-    QUORUM_PERCENTAGE,
-  ]);
-  await governorContract.deployed();
-  await governorContract.wait;
+  const { timeLock } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
+  const governorContract = await deploy('GovernorContract', {
+    from: deployer,
+    args: [
+      governanceToken.address,
+      timeLock,
+      VOTING_DELAY,
+      VOTING_PERIOD,
+      VOTING_THRESHOLD,
+      QUORUM_PERCENTAGE,
+    ],
+    log: true,
+    waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
+  })
 
   log(`GovernorContract deployed at: ${governorContract.address}`);
   const blockNumBefore = await ethers.provider.getBlockNumber();

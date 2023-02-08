@@ -1,33 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol";
 import "contracts/utils/ECDSA.sol";
+import "contracts/utils/EIP712.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "contracts/needModule/NeedStorage.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
 string constant SIGNATURE_VERSION = "1";
 
-contract VerifyVoucher is
-    OwnableUpgradeable,
-    EIP712Upgradeable,
-    UUPSUpgradeable
-{
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize() public initializer {
-        __EIP712_init(SIGNING_DOMAIN, SIGNATURE_VERSION);
-    }
-
-    event FallingBack(string msg);
+contract VerifyVoucher is EIP712 {
+    constructor() EIP712(SIGNING_DOMAIN, SIGNATURE_VERSION) {}
 
     function _hash(
-        NeedStorage.Voucher calldata _voucher
+        NeedStorage.SocialWorkerVoucher calldata _voucher
     ) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
@@ -37,8 +23,9 @@ contract VerifyVoucher is
                             "Voucher(uint256 needId,uint256 mintAmount,string tokenUri,string content)"
                         ),
                         _voucher.need.needId,
+                        _voucher.need.socialWorker.wallet,
+                        _voucher.need.auditor.wallet,
                         _voucher.mintAmount,
-                        keccak256(bytes(_voucher.tokenUri)),
                         keccak256(bytes(_voucher.content))
                     )
                 )
@@ -47,7 +34,7 @@ contract VerifyVoucher is
 
     // returns signer address
     function _verify(
-        NeedStorage.Voucher calldata _voucher
+        NeedStorage.SocialWorkerVoucher calldata _voucher
     ) public view virtual returns (address) {
         bytes32 digest = _hash(_voucher);
         return ECDSA.recover(digest, _voucher.signature);
@@ -60,13 +47,5 @@ contract VerifyVoucher is
             id := chainid()
         }
         return id;
-    }
-
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal override onlyOwner {}
-
-    fallback() external {
-        emit FallingBack("Store Fall Back");
     }
 }

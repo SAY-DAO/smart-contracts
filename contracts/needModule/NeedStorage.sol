@@ -1,20 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "../Helpers.sol";
+
 contract NeedStorage {
-    uint256 public targetNeedRatio;
+    address public treasuryAddress;
+    uint256 public targetNeedRatio = 1;
     address public timeLockAddress;
     uint256 public socialWorkerShare;
     uint256 public supervisor;
     uint256 public contributorShare;
 
+    // with needId store participants for that need
+    mapping(uint256 => mapping(address => FamilyMember)) participants;
+
     struct Need {
         uint256 needId;
-        uint256 paid;
+        uint256 paidInEth;
         NGO ngo;
-        SocialWorker socialWorker;
+        Contributor socialWorker;
+        Contributor auditor;
+        Contributor obtainer;
+        Miner minter;
         TheChild child;
-        FamilyMember[] payers;
         ServiceProvider serviceProvider;
         string[] IpfsReceipts;
         NeedDetails details;
@@ -38,41 +46,40 @@ contract NeedStorage {
         PERSONAL,
         UNIQUE
     }
+    enum ContributorType {
+        SOCIAL_WORKER,
+        OBTAINER,
+        AUDITOR
+    }
 
     /// @dev signature: From a Family member signing a transaction using the existing signature from social worker and need data
-    struct Voucher {
+    struct SocialWorkerVoucher {
         Need need;
-        address familyMember;
-        address socialWorker;
         bytes signature;
         uint256 mintAmount;
-        string tokenUri;
         string content;
     }
 
     struct NGO {
         uint256 ngoId;
         string name;
-        string contact;
+        string url;
     }
 
     struct ServiceProvider {
         string name;
-        string website;
+        string url;
     }
 
-    struct SocialWorker {
-        uint256 swId;
+    struct Contributor {
+        uint256 id;
+        ContributorType role;
         NGO ngo;
         address wallet;
     }
 
     struct TheChild {
-        uint256 childId;
         string SayName;
-        uint8 age;
-        string country;
-        string city;
         string voiceIpfsHash;
         string avatarIpfsHash;
     }
@@ -82,14 +89,26 @@ contract NeedStorage {
         address wallet;
     }
 
+    struct Miner {
+        address wallet;
+    }
+
     mapping(address => TheChild) private ChildByToken;
 
     mapping(uint256 => Need) private needById;
     mapping(uint256 => NeedType) private needTypes;
 
+    constructor(address _timeLockAddress) {
+        timeLockAddress = _timeLockAddress;
+    }
+
     modifier onlyOwner() {
         require(msg.sender == timeLockAddress, "Only the owner can do this.");
         _;
+    }
+
+    function updateTrasury(address _treasuryAddress) external onlyOwner {
+        treasuryAddress = _treasuryAddress;
     }
 
     /// @dev Function updateNeedRatio called from Need contract

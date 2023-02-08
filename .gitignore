@@ -13,6 +13,7 @@ artifacts
 typechain
 deployments
 typechain-types
+generatedMnemonic.txt
 
 # OpenZeppelin
 .openzeppelin/unknown-*.json

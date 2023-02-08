@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "contracts/needModule/NeedStorage.sol";
 import "contracts/interfaces/IVerifyVoucher.sol";
 import "contracts/governance/GovernanceToken.sol";
+import "../interfaces/ITreasury.sol";
 
 contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
@@ -27,19 +28,20 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     function initialize(
         address _needStorageAddress,
         address _voucherAddress,
-        address _timeLock
+        address _timeLockAddress
     ) public initializer {
         needStorageAddress = _needStorageAddress;
         voucherAddress = _voucherAddress;
         __UUPSUpgradeable_init();
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
-        _grantRole(TIME_LOCK_ROLE, _timeLock);
+        _grantRole(TIME_LOCK_ROLE, _timeLockAddress);
         needStorage = NeedStorage(needStorageAddress);
     }
 
     event Minted(
         uint256 needId,
+        address auditor,
         address familyMember,
         address socialWorker,
         uint256 mintAmount,
@@ -48,7 +50,7 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
 
     modifier verifier(
         NeedStorage.Need memory need,
-        NeedStorage.Voucher memory voucher
+        NeedStorage.SocialWorkerVoucher memory voucher
     ) {
         // KingVampire kv = KingVampire(kingVampireAddress);
         require(need.needId == 1, "Only the owner can do this.");
@@ -57,30 +59,30 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
 
     function mint(
         NeedStorage.Need memory need,
-        NeedStorage.Voucher calldata voucher
+        NeedStorage.SocialWorkerVoucher calldata voucher
     ) public payable verifier(need, voucher) {
         IVerifyVoucher verifyVoucher = IVerifyVoucher(voucherAddress);
-        address signer = verifyVoucher._verify(voucher);
+        address socialWorker = verifyVoucher._verify(voucher);
 
-        require(voucher.familyMember == signer, "Not signed by family!");
+        require(
+            voucher.need.socialWorker.wallet == socialWorker,
+            "Not signed by family!"
+        );
         require(
             voucher.mintAmount <= msg.value,
             "You must pay the voucher value"
         );
 
-        // Send staking tokens back to staker
-        GovernanceToken token = GovernanceToken(tokenAddress);
-        require(
-            token.transfer(
-                msg.sender,
-                stakes[stakeID].amountDeposited
-            ),
-            "Unlock failed"
-        );
+        // Send Eth tokens to Treasury
+        address treasuryAddress = NeedStorage(needStorageAddress)
+            .treasuryAddress();
+        ITreasury(treasuryAddress)._moduleDeposit();
+
         emit Minted(
             voucher.need.needId,
-            voucher.familyMember,
-            voucher.socialWorker,
+            voucher.need.auditor.wallet,
+            voucher.need.obtainer.wallet,
+            voucher.need.socialWorker.wallet,
             voucher.mintAmount,
             msg.sender
         );

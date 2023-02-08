@@ -2,6 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers, upgrades } from "hardhat";
 import { ADDRESS_ZERO, MIN_DELAY } from "../helpers/helper-hardhat-config";
+import fs from "fs";
 
 const setupContracts: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
@@ -12,18 +13,16 @@ const setupContracts: DeployFunction = async function (
   log(
     "------------------------- Grant / Revoke Roles ---------------------------"
   );
-console.log('1')
   const TimeLock = await ethers.getContractFactory("TimeLock");
-  const timeLock = await upgrades.deployProxy(TimeLock, [MIN_DELAY, [], []]);
-  await timeLock.deployed();
-  await timeLock.wait;
-console.log('2')
-  
+  let { timeLock } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
+  timeLock = TimeLock.attach(timeLock)
+
   // TO-DO: multicall
+  log("\n");
+  log("Current roles ...");
   const proposer = await timeLock.PROPOSER_ROLE();
   const executor = await timeLock.EXECUTOR_ROLE();
   const admin = await timeLock.TIMELOCK_ADMIN_ROLE();
-  console.log('3')
 
   const isProposer = await timeLock.hasRole(proposer, timeLock.address);
   const isExecutor = await timeLock.hasRole(executor, ADDRESS_ZERO);
@@ -32,8 +31,9 @@ console.log('2')
   log(`isProposer : ${isProposer} - ${timeLock.address}`);
   log(`isExecutor : ${isExecutor} - ${ADDRESS_ZERO}`);
   log(`isDeployerAdmin: ${isAdmin} - ${deployer}`);
+  
+  log("\n");
   log("Granting TimeLock ...");
-
   if (!isProposer) {
     const proposerTx = await timeLock.grantRole(proposer, timeLock.address);
     await proposerTx.wait(1);

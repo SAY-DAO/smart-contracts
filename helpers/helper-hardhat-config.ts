@@ -1,23 +1,28 @@
+import { eEthereumNetwork } from "./types";
+
 export interface networkConfigItem {
   ethUsdPriceFeed?: string;
   blockConfirmations?: number;
+  url?: string
 }
 
 export interface networkConfigInfo {
   [key: string]: networkConfigItem;
 }
 
-export const networkConfig: networkConfigInfo = {
-  localhost: {},
-  hardhat: {},
-  // Price Feed Address, values can be obtained at https://docs.chain.link/docs/reference-contracts
-  // Default one is ETH/USD contract on Kovan
-  rokenby: {
-    blockConfirmations: 1,
-  },
-  goerli: {
-    blockConfirmations: 1,
-  },
+export const networkConfig: any = (networkName: string) => {
+  return {
+    // Price Feed Address, values can be obtained at https://docs.chain.link/docs/reference-contracts
+    // Default one is ETH/USD contract on Kovan
+    rokenby: {
+      blockConfirmations: 1,
+      url: ''
+    },
+    goerli: {
+      blockConfirmations: 1,
+      url: `https://eth-${networkName}.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
+    },
+  }
 };
 
 export const developmentChains = ["hardhat", "localhost"];

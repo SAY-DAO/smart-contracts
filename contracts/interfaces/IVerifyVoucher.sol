@@ -5,6 +5,6 @@ import "contracts/needModule/NeedStorage.sol";
 
 interface IVerifyVoucher {
     function _verify(
-        NeedStorage.Voucher calldata voucher
+        NeedStorage.SocialWorkerVoucher calldata voucher
     ) external view returns (address);
 }
