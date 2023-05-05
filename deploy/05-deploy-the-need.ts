@@ -43,8 +43,6 @@ const deployTheNeed: DeployFunction = async function (
     timeLock
   ]);
   await theNeed.deployed();
-  await theNeed.wait;
-
 
   log(`Need deployed at at ${theNeed.address}`);
 

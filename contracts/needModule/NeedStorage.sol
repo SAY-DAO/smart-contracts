@@ -1,135 +1,146 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "../Helpers.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract NeedStorage {
+contract NeedStorage is Pausable, AccessControl {
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 public constant TIMELOCK_ROLE = keccak256("TIMELOCK_ROLE");
+
     address public treasuryAddress;
-    uint256 public targetNeedRatio = 1;
     address public timeLockAddress;
-    uint256 public socialWorkerShare;
-    uint256 public supervisor;
-    uint256 public contributorShare;
 
-    // with needId store participants for that need
-    mapping(uint256 => mapping(address => FamilyMember)) participants;
-
-    struct Need {
-        uint256 needId;
-        uint256 paidInEth;
-        NGO ngo;
-        Contributor socialWorker;
-        Contributor auditor;
-        Contributor obtainer;
-        Miner minter;
-        TheChild child;
-        ServiceProvider serviceProvider;
-        string[] IpfsReceipts;
-        NeedDetails details;
-    }
-
-    struct NeedDetails {
-        NeedType needType;
-        NeedDifficulty difficulty;
-        uint256 socialWorkerShare;
-        uint256 supervisor;
-        uint256 contributorShare;
-    }
-
-    enum NeedType {
+    enum NeedTypeEnum {
         SERVICE,
         PRODUCT
     }
 
-    enum NeedDifficulty {
+    enum NeedKindEnum {
         COMMON,
         PERSONAL,
         UNIQUE
     }
-    enum ContributorType {
+
+    enum ContributorRoles {
         SOCIAL_WORKER,
-        OBTAINER,
+        PURCHASER,
         AUDITOR
     }
 
-    /// @dev signature: From a Family member signing a transaction using the existing signature from social worker and need data
-    struct SocialWorkerVoucher {
-        Need need;
-        bytes signature;
-        uint256 mintAmount;
-        string content;
-    }
-
-    struct NGO {
-        uint256 ngoId;
-        string name;
-        string url;
-    }
-
-    struct ServiceProvider {
-        string name;
-        string url;
+    enum VirtualFamilyRoles {
+        VIRTUAL_MOM_ROLE,
+        VIRTUAL_DAD_ROLE,
+        VIRTUAL_AUNT_ROLE,
+        VIRTUAL_UNCLE_ROLE
     }
 
     struct Contributor {
-        uint256 id;
-        ContributorType role;
-        NGO ngo;
+        uint256 userId;
+        ContributorRoles sayRole;
+        uint256 ngoId;
         address wallet;
-    }
-
-    struct TheChild {
-        string SayName;
-        string voiceIpfsHash;
-        string avatarIpfsHash;
     }
 
     struct FamilyMember {
         uint256 userId;
+        VirtualFamilyRoles familyRole;
         address wallet;
     }
 
-    struct Miner {
-        address wallet;
+    struct Difficaulty {
+        uint8 creation;
+        uint8 audit;
+        uint8 logistic;
+        uint8 communityPrority;
     }
 
-    mapping(address => TheChild) private ChildByToken;
+    struct NeedDetails {
+        Difficaulty difficaulty;
+        mapping(address => uint256) vFamiliesShares;
+        uint256 socialWorkerShare;
+        uint256 auditorShare;
+        uint256 purchaserShare;
+        uint256 reward;
+    }
 
-    mapping(uint256 => Need) private needById;
-    mapping(uint256 => NeedType) private needTypes;
+    struct Need {
+        uint256 needId;
+        uint256 ngoId;
+        uint256 childId;
+        uint256 providerId;
+        Contributor socialWorker;
+        Contributor auditor;
+        Contributor purchaser;
+        mapping(address => FamilyMember) participants;
+        uint256 mintValue;
+        address minter;
+        NeedDetails details;
+    }
 
+    /**
+     * @dev signature: From a Family member signing a transaction using the existing signature from social worker and need data
+     */
+    struct SocialWorkerVoucher {
+        uint256 needId;
+        uint256 userId;
+        bytes signature;
+        address signer;
+        uint256 mintValue;
+        string content;
+    }
+
+    mapping(uint256 => Need) private needByToken;
+    mapping(NeedTypeEnum => mapping(NeedKindEnum => Difficaulty))
+        public difficaulties;
+
+    /**
+     * @dev Sets Grant admin role to timeLock
+     */
     constructor(address _timeLockAddress) {
+        _grantRole(PAUSER_ROLE, msg.sender);
+        _grantRole(TIMELOCK_ROLE, _timeLockAddress);
+        _grantRole(PAUSER_ROLE, _timeLockAddress);
         timeLockAddress = _timeLockAddress;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == timeLockAddress, "Only the owner can do this.");
-        _;
-    }
-
-    function updateTrasury(address _treasuryAddress) external onlyOwner {
+    function updateTrasury(
+        address _treasuryAddress
+    ) external onlyRole(TIMELOCK_ROLE) {
+        require(!paused(), "PAUSED");
         treasuryAddress = _treasuryAddress;
     }
 
-    /// @dev Function updateNeedRatio called from Need contract
-    /// @param newRatio timeLock will update whenever necessary
-    function _updateNeedRatio(uint256 newRatio) external onlyOwner {
-        targetNeedRatio = newRatio;
+    function updateDifficaulty(
+        Difficaulty memory _difficaulty,
+        NeedKindEnum _kind,
+        NeedTypeEnum _type
+    ) external onlyRole(TIMELOCK_ROLE) returns (Difficaulty memory) {
+        require(!paused(), "PAUSED");
+        Difficaulty memory difficaulty = difficaulties[_type][_kind];
+        if (difficaulty.creation <= 0) {
+            difficaulty = Difficaulty({
+                creation: _difficaulty.creation,
+                audit: _difficaulty.audit,
+                logistic: _difficaulty.logistic,
+                communityPrority: _difficaulty.communityPrority
+            });
+            difficaulties[_type][_kind] = _difficaulty;
+        } else {
+            difficaulty = difficaulties[_type][_kind];
+            difficaulty.creation = _difficaulty.creation;
+            difficaulty.audit = _difficaulty.audit;
+            difficaulty.logistic = _difficaulty.logistic;
+            difficaulty.communityPrority = _difficaulty.communityPrority;
+        }
+        return difficaulties[_type][_kind];
     }
 
-    /// @dev Function updateNeedRatio called from Need contract
-    /// @param swShare social worker share of work
-    /// @param svShare supervisor share of work
-    /// @param cShare contributor share fo work
-    function _updateNeedContribution(
-        uint256 swShare,
-        uint256 svShare,
-        uint256 cShare
-    ) external onlyOwner {
-        socialWorkerShare = swShare;
-        supervisor = svShare;
-        contributorShare = cShare;
+    function pause() public onlyRole(PAUSER_ROLE) {
+        _pause();
+    }
 
-        // emit ()
+    function unpause() public onlyRole(PAUSER_ROLE) {
+        _unpause();
     }
 }

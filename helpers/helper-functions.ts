@@ -3,15 +3,16 @@ import { run } from "hardhat";
 const verify = async (
   contractAddress: string,
   args: any[],
-  ContractPath: string
+  contractPath: string
 ) => {
   // verify the source code for your Solidity contracts
   console.log("hardhat-etherscan :  Verifying contract ...");
   try {
+    console.log(contractAddress, args, contractPath)
     await run("verify:verify", {
       address: contractAddress,
       constructorArguments: args,
-      contract: ContractPath,
+      contract: contractPath,
     });
   } catch (e: any) {
     if (e.message.toLowerCase().includes("already verified")) {

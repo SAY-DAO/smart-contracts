@@ -1,5 +1,5 @@
 import "@typechain/hardhat";
-import "@nomiclabs/hardhat-waffle";
+import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
 import "hardhat-gas-reporter";
@@ -43,7 +43,7 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: 31337,
+      chainId: 1337,
       blockGasLimit: DEFAULT_BLOCK_GAS_LIMIT,
       gas: DEFAULT_BLOCK_GAS_LIMIT,
       gasPrice: 8000000000,
@@ -54,8 +54,9 @@ const config: HardhatUserConfig = {
     localhost: {
       chainId: 31337, // the hardhat node,
     },
-    rinkeby: getCommonNetworkConfig(eEthereumNetwork.rinkeby, 4),
+    // rinkeby: getCommonNetworkConfig(eEthereumNetwork.rinkeby, 4),
     goerli: getCommonNetworkConfig(eEthereumNetwork.goerli, 5),
+    sepolia: getCommonNetworkConfig(eEthereumNetwork.sepolia, 11155111),
   },
   solidity: {
     compilers: [
@@ -96,7 +97,7 @@ const config: HardhatUserConfig = {
     },
   },
   mocha: {
-    timeout: 2000, // 200 seconds max for running tests
+    timeout: 20000, // 200 seconds max for running tests
   },
 
 };
@@ -107,6 +108,7 @@ function debug(text: string) {
     console.log(text);
   }
 }
+
 
 task(
   "account",

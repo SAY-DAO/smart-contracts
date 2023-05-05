@@ -15,6 +15,7 @@ const deployTimeLock: DeployFunction = async function (
   log(
     "------------------------- TimeLock Deployment ---------------------------"
   );
+  
   log("Deploying TimeLock ...");
   const timeLock = await deploy('TimeLock', {
     from: deployer,
@@ -31,7 +32,7 @@ const deployTimeLock: DeployFunction = async function (
   ) {
     await verify(
       timeLock.address,
-      [],
+      [MIN_DELAY, [], [], deployer],
       "contracts/governance/TimeLock.sol:TimeLock"
     );
   }

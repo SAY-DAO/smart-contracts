@@ -15,10 +15,17 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     bytes32 public constant TIME_LOCK_ROLE = keccak256("TIME_LOCK_ROLE");
 
     address public needStorageAddress;
-    NeedStorage public needStorage;
+    NeedStorage public needStorageConstact;
     address public voucherAddress;
 
     mapping(address => bool) private operatorStatus;
+
+    event Minted(
+        uint256 needId,
+        address socialWorker,
+        uint256 mintValue,
+        address minter
+    );
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -36,40 +43,18 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
         _grantRole(TIME_LOCK_ROLE, _timeLockAddress);
-        needStorage = NeedStorage(needStorageAddress);
-    }
-
-    event Minted(
-        uint256 needId,
-        address auditor,
-        address familyMember,
-        address socialWorker,
-        uint256 mintAmount,
-        address friend
-    );
-
-    modifier verifier(
-        NeedStorage.Need memory need,
-        NeedStorage.SocialWorkerVoucher memory voucher
-    ) {
-        // KingVampire kv = KingVampire(kingVampireAddress);
-        require(need.needId == 1, "Only the owner can do this.");
-        _;
+        needStorageConstact = NeedStorage(needStorageAddress);
     }
 
     function mint(
-        NeedStorage.Need memory need,
         NeedStorage.SocialWorkerVoucher calldata voucher
-    ) public payable verifier(need, voucher) {
+    ) public payable {
         IVerifyVoucher verifyVoucher = IVerifyVoucher(voucherAddress);
-        address socialWorker = verifyVoucher._verify(voucher);
+        address signer = verifyVoucher._verify(voucher);
 
+        require(voucher.signer == signer, "Not signed by family!");
         require(
-            voucher.need.socialWorker.wallet == socialWorker,
-            "Not signed by family!"
-        );
-        require(
-            voucher.mintAmount <= msg.value,
+            voucher.mintValue <= msg.value,
             "You must pay the voucher value"
         );
 
@@ -79,25 +64,11 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
         ITreasury(treasuryAddress)._moduleDeposit();
 
         emit Minted(
-            voucher.need.needId,
-            voucher.need.auditor.wallet,
-            voucher.need.obtainer.wallet,
-            voucher.need.socialWorker.wallet,
-            voucher.mintAmount,
+            voucher.needId,
+            voucher.signer,
+            voucher.mintValue,
             msg.sender
         );
-    }
-
-    /// @dev Function updateNeedRatio
-    /// @param newRatio timeLock will update the target ratio whenever necessary
-    function updateNeedRatio(uint256 newRatio) public onlyRole(TIME_LOCK_ROLE) {
-        needStorage = NeedStorage(needStorageAddress);
-        needStorage._updateNeedRatio(newRatio);
-    }
-
-    /// @dev Function fetchNeedRatio - for current ratio
-    function fetchNeedRatio() public view virtual returns (uint256) {
-        return (needStorage.targetNeedRatio());
     }
 
     function grantRole(

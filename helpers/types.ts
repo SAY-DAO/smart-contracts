@@ -5,4 +5,5 @@ export enum eEthereumNetwork {
   coverage = "coverage",
   hardhat = "hardhat",
   goerli = "goerli",
+  sepolia = "sepolia",
 }

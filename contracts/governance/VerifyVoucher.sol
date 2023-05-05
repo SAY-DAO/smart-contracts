@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import "contracts/utils/ECDSA.sol";
 import "contracts/utils/EIP712.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "contracts/needModule/NeedStorage.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
 string constant SIGNATURE_VERSION = "1";

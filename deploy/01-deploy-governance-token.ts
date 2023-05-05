@@ -30,7 +30,7 @@ const deployGovernanceToken: DeployFunction = async function (
   log(
     "------------------------- GovernanceToken Deployment ---------------------------"
   );
-
+console.log(deployer)
   const blockNumBefore = await ethers.provider.getBlockNumber();
   log(`BlockNumBefore: ${blockNumBefore}`);
 
@@ -41,10 +41,12 @@ const deployGovernanceToken: DeployFunction = async function (
     // we need to wait if on a live network so we can verify properly
     waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
   })
+
+  
   log(`GovernanceToken deployed at: ${governanceToken.address}`);
 
   if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
-    await verify(governanceToken.address, [], "contracts/tokens/ERC721/GovernanceToken.sol:GovernanceToken")
+    await verify(governanceToken.address, [], "contracts/governance/GovernanceToken.sol:GovernanceToken")
   }
 
   const blockNumAfter = await ethers.provider.getBlockNumber();

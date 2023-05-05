@@ -38,24 +38,24 @@ const setupContracts: DeployFunction = async function (
     const proposerTx = await timeLock.grantRole(proposer, timeLock.address);
     await proposerTx.wait(1);
   }
-  if (!isExecutor) {
-    const executorTx = await timeLock.grantRole(executor, ADDRESS_ZERO); // anybody can execute not only deployer
-    await executorTx.wait(1);
-  }
-  if (isAdmin) {
-    const revokeTx = await timeLock.revokeRole(admin, deployer);
-    await revokeTx.wait(1);
-  }
+  // if (!isExecutor) {
+  //   const executorTx = await timeLock.grantRole(executor, ADDRESS_ZERO); // anybody can execute not only deployer
+  //   await executorTx.wait(1);
+  // }
+  // if (isAdmin) {
+  //   const revokeTx = await timeLock.revokeRole(admin, deployer);
+  //   await revokeTx.wait(1);
+  // }
 
-  const isProposerNew = await timeLock.hasRole(proposer, timeLock.address);
-  const isExecutorNew = await timeLock.hasRole(executor, ADDRESS_ZERO);
-  const isAdminNew = await timeLock.hasRole(admin, deployer);
-  const isTimeLockAdminNew = await timeLock.hasRole(admin, timeLock.address);
+  // const isProposerNew = await timeLock.hasRole(proposer, timeLock.address);
+  // const isExecutorNew = await timeLock.hasRole(executor, ADDRESS_ZERO);
+  // const isAdminNew = await timeLock.hasRole(admin, deployer);
+  // const isTimeLockAdminNew = await timeLock.hasRole(admin, timeLock.address);
 
-  log(`isProposer : ${isProposerNew} - ${timeLock.address}`);
-  log(`isExecutor : ${isExecutorNew} - ${ADDRESS_ZERO}`);
-  log(`isDeployerAdmin: ${isAdminNew} - ${deployer}`);
-  log(`isTimeLockAdmin: ${isTimeLockAdminNew} - ${timeLock.address}`);
+  // log(`isProposer : ${isProposerNew} - ${timeLock.address}`);
+  // log(`isExecutor : ${isExecutorNew} - ${ADDRESS_ZERO}`);
+  // log(`isDeployerAdmin: ${isAdminNew} - ${deployer}`);
+  // log(`isTimeLockAdmin: ${isTimeLockAdminNew} - ${timeLock.address}`);
 };
 
 export default setupContracts;
