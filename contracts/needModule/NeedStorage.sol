@@ -83,12 +83,14 @@ contract NeedStorage is Pausable, AccessControl {
      */
     struct SocialWorkerVoucher {
         uint256 needId;
-        uint256 userId;
+        uint256 socialWorkerId;
         bytes signature;
-        address signer;
+        address signer; // socialWorker
         uint256 mintValue;
         string content;
     }
+
+    SocialWorkerVoucher public socialWorkerVoucher;
 
     mapping(uint256 => Need) private needByToken;
     mapping(NeedTypeEnum => mapping(NeedKindEnum => Difficaulty))
@@ -134,6 +136,10 @@ contract NeedStorage is Pausable, AccessControl {
             difficaulty.communityPrority = _difficaulty.communityPrority;
         }
         return difficaulties[_type][_kind];
+    }
+
+    function getTresaryAddress() public view {
+        treasuryAddress;
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

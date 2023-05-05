@@ -19,6 +19,8 @@ contract Treasury is Pausable, AccessControl {
     mapping(address => Module) public modules;
     address public tokenAddress;
 
+    event ValueReceived(address user, uint amount);
+
     constructor(address _tokenAddress, address _moduleAddress) {
         tokenAddress = _tokenAddress;
         _grantRole(TIME_LOCK, tokenAddress);
@@ -62,8 +64,15 @@ contract Treasury is Pausable, AccessControl {
         modules[moduleAddress].isRegistered = false;
     }
 
-    function _moduleDeposit() external payable onlyRole(TIME_LOCK) {
-        GovernanceToken token = GovernanceToken(tokenAddress);
-        require(token.transfer(address(this), msg.value), "Transfer failed!");
+    // function _moduleDeposit() external payable onlyRole(TIME_LOCK) {
+    //     GovernanceToken token = GovernanceToken(tokenAddress);
+    //     require(token.transfer(address(this), msg.value), "Transfer failed!");
+    // }
+
+    receive() external payable {
+        emit ValueReceived(msg.sender, msg.value);
     }
+
+    fallback() external payable {}
+
 }
