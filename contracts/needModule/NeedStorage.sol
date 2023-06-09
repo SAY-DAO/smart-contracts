@@ -81,16 +81,23 @@ contract NeedStorage is Pausable, AccessControl {
     /**
      * @dev signature: From a Family member signing a transaction using the existing signature from social worker and need data
      */
-    struct SocialWorkerVoucher {
+    struct FinalVoucher {
         uint256 needId;
-        uint256 socialWorkerId;
-        bytes signature;
-        address signer; // socialWorker
+        uint256 socialWorkerId;   
+        uint256[] vFamiliesIds;
         uint256 mintValue;
+        // wallets
+        address swWallet;
+        address auditorWallet;
+        address purchaserWallet;
+        address[] vFamiliesWallet; // virtual families who participated
+        //signatures
+        bytes swSignature; // social worker signature
+        bytes signature;
         string content;
     }
 
-    SocialWorkerVoucher public socialWorkerVoucher;
+    FinalVoucher public voucher;
 
     mapping(uint256 => Need) private needByToken;
     mapping(NeedTypeEnum => mapping(NeedKindEnum => Difficaulty))

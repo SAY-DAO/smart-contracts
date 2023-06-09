@@ -2,12 +2,13 @@
 pragma solidity ^0.8.4;
 
 interface INeedStorage {
-    struct SocialWorkerVoucher {
+    struct FinalVoucher {
         uint256 needId;
-        uint256 socialWorkerId;
+        uint256 socialWorkerId; // Need Creator
         bytes signature;
-        address signer;
+        address signer; // reltive / خویس‌آوند
         uint256 mintValue;
+        string swSignature; // social worker signature
         string content;
     }
 

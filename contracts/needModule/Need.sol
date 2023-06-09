@@ -32,6 +32,14 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
+    modifier validateVoucher(INeedStorage.FinalVoucher calldata voucher) {
+        IVerifyVoucher verifyVoucher = IVerifyVoucher(voucherAddress);
+        address signer = verifyVoucher._verify(voucher);
+
+        require(voucher.signer == signer, "Not signed by family!");
+        _;
+    }
+
     function initialize(
         address _needStorageAddress,
         address _voucherAddress,
@@ -47,12 +55,8 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
     }
 
     function mint(
-        INeedStorage.SocialWorkerVoucher calldata voucher
-    ) public payable {
-        IVerifyVoucher verifyVoucher = IVerifyVoucher(voucherAddress);
-        address signer = verifyVoucher._verify(voucher);
-
-        require(voucher.signer == signer, "Not signed by family!");
+        INeedStorage.FinalVoucher calldata voucher
+    ) public payable validateVoucher(voucher) {
         require(
             voucher.mintValue <= msg.value,
             "You must pay the voucher value"

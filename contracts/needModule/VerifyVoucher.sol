@@ -11,18 +11,19 @@ string constant SIGNATURE_VERSION = "1";
 contract VerifyVoucher is EIP712 {
     constructor() EIP712(SIGNING_DOMAIN, SIGNATURE_VERSION) {}
 
-    function _hash(
-        INeedStorage.SocialWorkerVoucher calldata _voucher
+    function _digestHash(
+        INeedStorage.FinalVoucher calldata _voucher
     ) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
                 keccak256(
                     abi.encode(
                         keccak256(
-                            "Voucher(uint256 needId,uint256 mintAmount,string content)"
+                            "Voucher(uint256 needId,uint256 socialWorkerId,string swSignature,string content)"
                         ),
                         _voucher.needId,
-                        _voucher.mintValue,
+                        _voucher.socialWorkerId,
+                        keccak256(bytes(_voucher.swSignature)),
                         keccak256(bytes(_voucher.content))
                     )
                 )
@@ -31,9 +32,9 @@ contract VerifyVoucher is EIP712 {
 
     // returns signer address
     function _verify(
-        INeedStorage.SocialWorkerVoucher calldata _voucher
+        INeedStorage.FinalVoucher calldata _voucher
     ) public view virtual returns (address) {
-        bytes32 digest = _hash(_voucher);
+        bytes32 digest = _digestHash(_voucher);
         return ECDSA.recover(digest, _voucher.signature);
     }
 
