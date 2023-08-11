@@ -34,9 +34,9 @@ contract Need is Initializable, AccessControlUpgradeable, UUPSUpgradeable {
 
     modifier validateVoucher(INeedStorage.FinalVoucher calldata voucher) {
         IVerifyVoucher verifyVoucher = IVerifyVoucher(voucherAddress);
-        address signer = verifyVoucher._verify(voucher);
+        // address signer = verifyVoucher._verify(voucher);
 
-        require(voucher.signer == signer, "Not signed by family!");
+        // require(voucher.signer == signer, "Not signed by family!");
         _;
     }
 

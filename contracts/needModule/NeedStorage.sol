@@ -83,7 +83,6 @@ contract NeedStorage is Pausable, AccessControl {
      */
     struct FinalVoucher {
         uint256 needId;
-        uint256 socialWorkerId;   
         uint256[] vFamiliesIds;
         uint256 mintValue;
         // wallets

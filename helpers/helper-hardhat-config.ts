@@ -3,26 +3,21 @@ import { eEthereumNetwork } from "./types";
 export interface networkConfigItem {
   ethUsdPriceFeed?: string;
   blockConfirmations?: number;
-  url?: string
+  url?: string;
 }
 
 export interface networkConfigInfo {
   [key: string]: networkConfigItem;
 }
 
-export const networkConfig: any = (networkName: string) => {
+export const networkConfig: any = (
+  networkName: string,
+  blockConfirmations: number,
+) => {
   return {
-    // Price Feed Address, values can be obtained at https://docs.chain.link/docs/reference-contracts
-    // Default one is ETH/USD contract on Kovan
-    rikenby: {
-      blockConfirmations: 1,
-      url: ''
-    },
-    goerli: {
-      blockConfirmations: 5,
-      url: `https://eth-${networkName}.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
-    },
-  }
+    blockConfirmations: blockConfirmations,
+    url: `https://eth-${networkName}.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
+  };
 };
 
 export const developmentChains = ["hardhat", "localhost"];
@@ -45,5 +40,5 @@ export const PROPOSAL_DESCRIPTION = "Proposal #1 Changed Need_Ratio to 0.7!";
 export const SUPPORT = 1;
 export const REASON = "my reasons!";
 
-export const SIGNING_DOMAIN_NAME = 'SAY-DAO';
-export const SIGNING_DOMAIN_VERSION = '1';
+export const SIGNING_DOMAIN_NAME = "SAY-DAO";
+export const SIGNING_DOMAIN_VERSION = "1";

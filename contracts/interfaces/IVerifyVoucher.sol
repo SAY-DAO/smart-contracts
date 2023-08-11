@@ -4,6 +4,6 @@ import "./INeedStorage.sol";
 
 interface IVerifyVoucher {
     function _verify(
-        INeedStorage.FinalVoucher calldata _voucher
+        INeedStorage.InitialVoucher calldata _voucher
     ) external returns (address);
 }
