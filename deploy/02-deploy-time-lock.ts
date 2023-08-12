@@ -1,24 +1,24 @@
-// import { HardhatRuntimeEnvironment } from "hardhat/types";
-// import { DeployFunction } from "hardhat-deploy/types";
-// import verify from "../helpers/helper-functions";
-// import {
-//   developmentChains,
-//   MIN_DELAY,
-//   networkConfig,
-// } from "../helpers/helper-hardhat-config";
-// import { getNamedAccounts } from "hardhat";
-// import fs from "fs";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import verify from "../helpers/helper-functions";
+import {
+  developmentChains,
+  MIN_DELAY,
+  networkConfig,
+} from "../helpers/helper-hardhat-config";
+import { getNamedAccounts } from "hardhat";
+import fs from "fs";
 
-// const deployTimeLock: DeployFunction = async function (
-//   hre: HardhatRuntimeEnvironment
-// ) {
-//   // @ts-ignore
-//   const { deployments, network } = hre;
-//   const { deployer } = await getNamedAccounts();
-//   const { deploy, log } = deployments;
-//   log(
-//     "------------------------- TimeLock Deployment ---------------------------"
-//   );
+const deployTimeLock: DeployFunction = async function (
+  hre: HardhatRuntimeEnvironment
+) {
+  // @ts-ignore
+  const { deployments, network } = hre;
+  const { deployer } = await getNamedAccounts();
+  const { deploy, log } = deployments;
+  log(
+    "------------------------- TimeLock Deployment ---------------------------"
+  );
 
 //   log("Deploying TimeLock ...");
 //   const timeLock = await deploy("TimeLock", {
@@ -51,7 +51,7 @@
 //     let dictstring = JSON.stringify(data);
 //     fs.writeFileSync("network-settings.json", dictstring);
 //   }
-// };
-// export default deployTimeLock;
-// deployTimeLock.tags = ["all", "timelock"];
-// module.exports.dependencies = ["GovernanceToken"]; // this ensure the Token script above is executed first, so `deployments.get('Token')` succeeds
+};
+export default deployTimeLock;
+deployTimeLock.tags = ["all", "timelock"];
+module.exports.dependencies = ["GovernanceToken"]; // this ensure the Token script above is executed first, so `deployments.get('Token')` succeeds

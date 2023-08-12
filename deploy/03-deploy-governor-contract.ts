@@ -1,29 +1,29 @@
-// import { HardhatRuntimeEnvironment } from "hardhat/types";
-// import { DeployFunction } from "hardhat-deploy/types";
-// import {
-//   QUORUM_PERCENTAGE,
-//   VOTING_PERIOD,
-//   VOTING_DELAY,
-//   VOTING_THRESHOLD,
-//   MIN_DELAY,
-//   ADDRESS_ZERO,
-//   developmentChains,
-//   networkConfig,
-// } from "../helpers/helper-hardhat-config";
-// import { ethers, getNamedAccounts, upgrades } from "hardhat";
-// import verify from "../helpers/helper-functions";
-// import fs from "fs";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import {
+  QUORUM_PERCENTAGE,
+  VOTING_PERIOD,
+  VOTING_DELAY,
+  VOTING_THRESHOLD,
+  MIN_DELAY,
+  ADDRESS_ZERO,
+  developmentChains,
+  networkConfig,
+} from "../helpers/helper-hardhat-config";
+import { ethers, getNamedAccounts, upgrades } from "hardhat";
+import verify from "../helpers/helper-functions";
+import fs from "fs";
 
-// const deployGovernorContract: DeployFunction = async function (
-//   hre: HardhatRuntimeEnvironment
-// ) {
-//   const { deployer } = await getNamedAccounts()
-//   const { deployments, network } = hre;
-//   const { log, deploy } = deployments;
+const deployGovernorContract: DeployFunction = async function (
+  hre: HardhatRuntimeEnvironment
+) {
+  const { deployer } = await getNamedAccounts()
+  const { deployments, network } = hre;
+  const { log, deploy } = deployments;
 
-//   log(
-//     "------------------------- GovernorContract Deployment ---------------------------"
-//   );
+  log(
+    "------------------------- GovernorContract Deployment ---------------------------"
+  );
 //   log("Deploying GovernanceToken ...");
 //   const governanceToken = await deploy('GovernanceToken', {
 //     from: deployer,
@@ -51,7 +51,7 @@
 //   log(`GovernorContract deployed at: ${governorContract.address}`);
 //   const blockNumBefore = await ethers.provider.getBlockNumber();
 //   log(`BlockNumBeforeat: ${blockNumBefore}`);
-// };
+};
 
-// export default deployGovernorContract;
-// deployGovernorContract.tags = ["all", "governor"];
+export default deployGovernorContract;
+deployGovernorContract.tags = ["all", "governor"];

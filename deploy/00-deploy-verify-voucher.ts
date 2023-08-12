@@ -9,7 +9,7 @@ import { getNamedAccounts } from "hardhat";
 import fs from "fs";
 import { checkIfFileOrDirectoryExists, deleteFile } from "../helpers/file";
 
-const deployTimeLock: DeployFunction = async function (
+const deployVerifyVoucher: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment
 ) {
   const { deployments, network } = hre;
@@ -64,6 +64,6 @@ const deployTimeLock: DeployFunction = async function (
     );
   }
 };
-export default deployTimeLock;
-deployTimeLock.tags = ["all", "verifyVoucher"];
+export default deployVerifyVoucher;
+deployVerifyVoucher.tags = ["all", "verifyVoucher"];
 module.exports.dependencies = ["GovernanceToken"]; // this ensure the Token script above is executed first, so `deployments.get('Token')` succeeds

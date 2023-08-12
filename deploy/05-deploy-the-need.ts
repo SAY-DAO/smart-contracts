@@ -1,25 +1,24 @@
-// import { HardhatRuntimeEnvironment } from "hardhat/types";
-// import { DeployFunction } from "hardhat-deploy/types";
-// import verify from "../helpers/helper-functions";
-// import {
-//   developmentChains,
-//   NEED_RATIO,
-//   networkConfig,
-// } from "../helpers/helper-hardhat-config";
-// import { ethers, upgrades } from "hardhat";
-// import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
-// import { getImplementationAddress } from "@openzeppelin/upgrades-core";
-// import fs from "fs";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import verify from "../helpers/helper-functions";
+import {
+  developmentChains,
+  NEED_RATIO,
+  networkConfig,
+} from "../helpers/helper-hardhat-config";
+import { ethers, upgrades } from "hardhat";
+import { getImplementationAddress } from "@openzeppelin/upgrades-core";
+import fs from "fs";
 
-// const deployTheNeed: DeployFunction = async function (
-//   hre: HardhatRuntimeEnvironment
-// ) {
-//   // @ts-ignore
-//   const { deployer } = await getNamedAccounts()
-//   const { deployments, network } = hre;
-//   const { log, deploy } = deployments;
+const deployTheNeed: DeployFunction = async function (
+  hre: HardhatRuntimeEnvironment
+) {
+  // @ts-ignore
+  const { deployer } = await getNamedAccounts()
+  const { deployments, network } = hre;
+  const { log, deploy } = deployments;
 
-//   log("------------------------- Need Deployment ---------------------------");
+  log("------------------------- Need Deployment ---------------------------");
 //   const TimeLock = await ethers.getContractFactory("TimeLock");
 //   let { timeLock, verifyVoucher } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
 
@@ -74,7 +73,7 @@
 //     await transferTx.wait(1);
 //   }
 //   log(`Need NOW is owned and governed by TimeLock: ${timeLock}`);
-// };
+};
 
-// export default deployTheNeed;
-// deployTheNeed.tags = ["all", "theNeed"];
+export default deployTheNeed;
+deployTheNeed.tags = ["all", "theNeed"];

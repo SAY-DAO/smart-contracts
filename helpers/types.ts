@@ -1,11 +1,17 @@
 export enum eEthereumNetwork {
   kovan = "kovan",
   rinkeby = "rinkeby",
-  main = "main",
+  mainnet = "mainnet",
   coverage = "coverage",
   hardhat = "hardhat",
   goerli = "goerli",
   sepolia = "sepolia",
+}
+
+export enum eEthereumNetworkChainId {
+  mainnet = 1,
+  goerli = 5,
+  sepolia = 11155111,
 }
 
 export enum VirtualFamilyRole {

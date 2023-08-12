@@ -11,7 +11,7 @@ coverage.json
 cache
 artifacts
 typechain
-deployments
+solcInputs
 typechain-types
 generatedMnemonic.txt
 network-settings.json

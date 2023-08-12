@@ -1,6 +1,5 @@
 import "@typechain/hardhat";
 import "@nomicfoundation/hardhat-chai-matchers";
-import "hardhat-gas-reporter";
 import "dotenv/config";
 import chalk from "chalk";
 import "solidity-coverage";
@@ -9,7 +8,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "@nomicfoundation/hardhat-ethers"; // This plugins adds an ethers object to the Hardhat Runtime Environment.
 import "@nomicfoundation/hardhat-toolbox";
 import fs from "fs";
-import { eEthereumNetwork } from "./helpers/types";
+import { eEthereumNetwork, eEthereumNetworkChainId } from "./helpers/types";
 import { task } from "hardhat/config";
 import { Wallet } from "ethers";
 import { HardhatUserConfig } from "hardhat/config";
@@ -18,6 +17,8 @@ import { networkConfig } from "./helpers/helper-hardhat-config";
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+const PRIVATE_KEY_SAY_DAO_MAINNET =
+  process.env.PRIVATE_KEY_SAY_DAO_MAINNET || "";
 
 const DEFAULT_BLOCK_GAS_LIMIT = 12450000;
 const DEFAULT_GAS_PRICE = 10;
@@ -30,7 +31,10 @@ const getCommonNetworkConfig = (
     url: networkConfig(networkName).url,
     gasMultiplier: DEFAULT_GAS_PRICE,
     chainId: networkId,
-    accounts: [PRIVATE_KEY],
+    accounts:
+      networkId === eEthereumNetworkChainId.mainnet
+        ? [PRIVATE_KEY_SAY_DAO_MAINNET]
+        : [PRIVATE_KEY],
   };
 };
 
@@ -50,8 +54,18 @@ const config: HardhatUserConfig = {
       chainId: 31337, // the hardhat node,
     },
     // rinkeby: getCommonNetworkConfig(eEthereumNetwork.rinkeby, 4),
-    goerli: getCommonNetworkConfig(eEthereumNetwork.goerli, 5),
-    sepolia: getCommonNetworkConfig(eEthereumNetwork.sepolia, 11155111),
+    goerli: getCommonNetworkConfig(
+      eEthereumNetwork.goerli,
+      eEthereumNetworkChainId.goerli,
+    ),
+    sepolia: getCommonNetworkConfig(
+      eEthereumNetwork.sepolia,
+      eEthereumNetworkChainId.sepolia,
+    ),
+    mainnet: getCommonNetworkConfig(
+      eEthereumNetwork.mainnet,
+      eEthereumNetworkChainId.mainnet,
+    ),
   },
   solidity: {
     compilers: [
@@ -79,10 +93,10 @@ const config: HardhatUserConfig = {
     apiKey: ETHERSCAN_API_KEY,
   },
   gasReporter: {
-    enabled: false,
+    enabled: (process.env.REPORT_GAS) ? true : false,
     currency: "USD",
     outputFile: "SAY-DAO-gas-report.txt",
-    noColors: false,
+    noColors: true,
     coinmarketcap: COINMARKETCAP_API_KEY,
   },
   namedAccounts: {
@@ -92,7 +106,7 @@ const config: HardhatUserConfig = {
     },
   },
   mocha: {
-    timeout: 20000, // 200 seconds max for running tests
+    timeout: 30000, // 200 seconds max for running tests
   },
 };
 

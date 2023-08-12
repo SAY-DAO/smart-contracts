@@ -1,18 +1,18 @@
-// import { HardhatRuntimeEnvironment } from "hardhat/types";
-// import { DeployFunction } from "hardhat-deploy/types";
-// import { ethers, upgrades } from "hardhat";
-// import { ADDRESS_ZERO, MIN_DELAY } from "../helpers/helper-hardhat-config";
-// import fs from "fs";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import { ethers, upgrades } from "hardhat";
+import { ADDRESS_ZERO, MIN_DELAY } from "../helpers/helper-hardhat-config";
+import fs from "fs";
 
-// const setupContracts: DeployFunction = async function (
-//   hre: HardhatRuntimeEnvironment
-// ) {
-//   const { getNamedAccounts, deployments } = hre;
-//   const { log } = deployments;
-//   const { deployer } = await getNamedAccounts();
-//   log(
-//     "------------------------- Grant / Revoke Roles ---------------------------"
-//   );
+const setupContracts: DeployFunction = async function (
+  hre: HardhatRuntimeEnvironment
+) {
+  const { getNamedAccounts, deployments } = hre;
+  const { log } = deployments;
+  const { deployer } = await getNamedAccounts();
+  log(
+    "------------------------- Grant / Revoke Roles ---------------------------"
+  );
 //   const TimeLock = await ethers.getContractFactory("TimeLock");
 //   let { timeLock } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
 //   timeLock = TimeLock.attach(timeLock)
@@ -56,7 +56,7 @@
 //   // log(`isExecutor : ${isExecutorNew} - ${ADDRESS_ZERO}`);
 //   // log(`isDeployerAdmin: ${isAdminNew} - ${deployer}`);
 //   // log(`isTimeLockAdmin: ${isTimeLockAdminNew} - ${timeLock.address}`);
-// };
+};
 
-// export default setupContracts;
-// setupContracts.tags = ["all", "setup"];
+export default setupContracts;
+setupContracts.tags = ["all", "setup"];
