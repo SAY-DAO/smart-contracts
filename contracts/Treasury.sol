@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "contracts/governance/GovernanceToken.sol";
 
@@ -74,5 +74,4 @@ contract Treasury is Pausable, AccessControl {
     }
 
     fallback() external payable {}
-
 }

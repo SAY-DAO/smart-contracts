@@ -13,49 +13,47 @@ const setupContracts: DeployFunction = async function (
   log(
     "------------------------- Grant / Revoke Roles ---------------------------"
   );
-//   const TimeLock = await ethers.getContractFactory("TimeLock");
-//   let { timeLock } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
-//   timeLock = TimeLock.attach(timeLock)
+  let { governor: governorAddress, timeLock: timeLockAddress } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
+  const TimeLock = await ethers.getContractFactory("TimeLock");
+  const timeLock = TimeLock.attach(timeLockAddress)
 
-//   // TO-DO: multicall
-//   log("\n");
-//   log("Current roles ...");
-//   const proposer = await timeLock.PROPOSER_ROLE();
-//   const executor = await timeLock.EXECUTOR_ROLE();
-//   const admin = await timeLock.TIMELOCK_ADMIN_ROLE();
+  // TO-DO: multicall
+  log("\n");
+  log("Current roles ...");
+  const proposerRole = await timeLock.PROPOSER_ROLE();
+  const executorRole = await timeLock.EXECUTOR_ROLE();
+  const adminRole = await timeLock.DEFAULT_ADMIN_ROLE();
 
-//   const isProposer = await timeLock.hasRole(proposer, timeLock.address);
-//   const isExecutor = await timeLock.hasRole(executor, ADDRESS_ZERO);
-//   const isAdmin = await timeLock.hasRole(admin, timeLock.address);
+  const isGovernorProposer = await timeLock.hasRole(proposerRole, governorAddress);
+  const isAllExecutor = await timeLock.hasRole(executorRole, ADDRESS_ZERO);
+  const isDeployerAdmin = await timeLock.hasRole(adminRole, deployer);
 
-//   log(`isProposer : ${isProposer} - ${timeLock.address}`);
-//   log(`isExecutor : ${isExecutor} - ${ADDRESS_ZERO}`);
-//   log(`isDeployerAdmin: ${isAdmin} - ${deployer}`);
-  
-//   log("\n");
-//   log("Granting TimeLock ...");
-//   if (!isProposer) {
-//     const proposerTx = await timeLock.grantRole(proposer, timeLock.address);
-//     await proposerTx.wait(1);
-//   }
-//   // if (!isExecutor) {
-//   //   const executorTx = await timeLock.grantRole(executor, ADDRESS_ZERO); // anybody can execute not only deployer
-//   //   await executorTx.wait(1);
-//   // }
-//   // if (isAdmin) {
-//   //   const revokeTx = await timeLock.revokeRole(admin, deployer);
-//   //   await revokeTx.wait(1);
-//   // }
+  log(`isGovernorProposer : ${isGovernorProposer} - ${governorAddress}`);
+  log(`isAllExecutor : ${isAllExecutor} - ${ADDRESS_ZERO}`);
+  log(`isDeployerAdmin: ${isDeployerAdmin} - ${deployer}`);
 
-//   // const isProposerNew = await timeLock.hasRole(proposer, timeLock.address);
-//   // const isExecutorNew = await timeLock.hasRole(executor, ADDRESS_ZERO);
-//   // const isAdminNew = await timeLock.hasRole(admin, deployer);
-//   // const isTimeLockAdminNew = await timeLock.hasRole(admin, timeLock.address);
+  log("\n");
+  log("Granting TimeLock ...");
+  if (!isGovernorProposer) {
+    const proposerTx = await timeLock.grantRole(proposerRole, governorAddress);
+    await proposerTx.wait(1);
+  }
+  if (!isAllExecutor) {
+    const executorTx = await timeLock.grantRole(executorRole, ADDRESS_ZERO); // anybody can execute not only deployer
+    await executorTx.wait(1);
+  }
+    const revokeTx = await timeLock.revokeRole(adminRole, deployer);
+    await revokeTx.wait(1);
 
-//   // log(`isProposer : ${isProposerNew} - ${timeLock.address}`);
-//   // log(`isExecutor : ${isExecutorNew} - ${ADDRESS_ZERO}`);
-//   // log(`isDeployerAdmin: ${isAdminNew} - ${deployer}`);
-//   // log(`isTimeLockAdmin: ${isTimeLockAdminNew} - ${timeLock.address}`);
+  const isGovernorProposerNew = await timeLock.hasRole(proposerRole, governorAddress);
+  const isExecutorNew = await timeLock.hasRole(executorRole, ADDRESS_ZERO);
+  const isDeployerAdminNew = await timeLock.hasRole(adminRole, deployer);
+  const isTimeLockAdmin = await timeLock.hasRole(adminRole, timeLockAddress);
+
+  log(`isGovernorProposer : ${isGovernorProposerNew} - ${governorAddress}`);
+  log(`isAllExecutor : ${isExecutorNew} - ${ADDRESS_ZERO}`);
+  log(`isDeployerAdmin: ${isDeployerAdminNew} - ${deployer}`);
+  log(`isTimeLockAdmin: ${isTimeLockAdmin} - ${timeLockAddress}`);
 };
 
 export default setupContracts;

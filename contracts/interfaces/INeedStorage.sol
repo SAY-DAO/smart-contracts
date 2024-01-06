@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.20;
 
 interface INeedStorage {
     struct FinalVoucher {
@@ -13,15 +13,16 @@ interface INeedStorage {
 
     struct InitialVoucher {
         uint256 needId;
-        string title; 
-        string category; 
-        uint256 paid; 
-        string deliveryCode; 
-        string child; 
-        address signer; 
+        string title;
+        string category;
+        uint256 paid;
+        string deliveryCode;
+        string child;
+        address signer;
         bytes swSignature; // social worker signature
         string role;
         string content;
     }
+
     function getTresaryAddress() external returns (address);
 }

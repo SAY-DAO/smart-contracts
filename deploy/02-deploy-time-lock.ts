@@ -20,37 +20,37 @@ const deployTimeLock: DeployFunction = async function (
     "------------------------- TimeLock Deployment ---------------------------"
   );
 
-//   log("Deploying TimeLock ...");
-//   const timeLock = await deploy("TimeLock", {
-//     from: deployer,
-//     args: [MIN_DELAY, [], [], deployer],
-//     log: true,
-//     waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
-//   });
+  log("Deploying TimeLock ...");
+  const timeLock = await deploy("TimeLock", {
+    from: deployer,
+    args: [MIN_DELAY, [], [], deployer],
+    log: true,
+    waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
+  });
 
-//   log(`TimeLock deployed at: ${timeLock.address}`);
+  log(`TimeLock deployed at: ${timeLock.address}`);
 
-//   if (
-//     !developmentChains.includes(network.name) &&
-//     process.env.ETHERSCAN_API_KEY
-//   ) {
-//     await verify(
-//       timeLock.address,
-//       [MIN_DELAY, [], [], deployer],
-//       "contracts/governance/TimeLock.sol:TimeLock"
-//     );
-//   }
-//   const stringFile = fs.readFileSync("network-settings.json", "utf8");
-//   const file = JSON.parse(stringFile);
+  if (
+    !developmentChains.includes(network.name) &&
+    process.env.ETHERSCAN_API_KEY
+  ) {
+    await verify(
+      timeLock.address,
+      [MIN_DELAY, [], [], deployer],
+      "contracts/governance/TimeLock.sol:TimeLock"
+    );
+  }
+  const stringFile = fs.readFileSync("network-settings.json", "utf8");
+  const file = JSON.parse(stringFile);
 
-//   if (typeof(file.verifyVoucher) !== 'string' || typeof(file.timeLock) !== 'string') {
-//     let data = {
-//       timeLock: timeLock.address,
-//       verifyVoucher: file.verifyVoucher,
-//     };
-//     let dictstring = JSON.stringify(data);
-//     fs.writeFileSync("network-settings.json", dictstring);
-//   }
+  if (typeof(file.verifyVoucher) !== 'string' || typeof(file.timeLock) !== 'string') {
+    let data = {
+      timeLock: timeLock.address,
+      verifyVoucher: file.verifyVoucher,
+    };
+    let dictstring = JSON.stringify(data);
+    fs.writeFileSync("network-settings.json", dictstring);
+  }
 };
 export default deployTimeLock;
 deployTimeLock.tags = ["all", "timelock"];

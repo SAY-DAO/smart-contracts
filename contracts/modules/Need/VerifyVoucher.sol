@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-// import "hardhat/console.sol";
 import "contracts/utils/ECDSA.sol";
 import "contracts/utils/EIP712.sol";
-import "../interfaces/INeedStorage.sol";
+import "../../interfaces/INeedStorage.sol";
 
 string constant SIGNING_DOMAIN = "SAY-DAO";
-string constant SIGNATURE_VERSION = "1";
+string constant SIGNATURE_VERSION = "2";
 
 contract VerifyVoucher is EIP712 {
     constructor() EIP712(SIGNING_DOMAIN, SIGNATURE_VERSION) {}

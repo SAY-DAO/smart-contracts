@@ -24,33 +24,45 @@ const deployGovernorContract: DeployFunction = async function (
   log(
     "------------------------- GovernorContract Deployment ---------------------------"
   );
-//   log("Deploying GovernanceToken ...");
-//   const governanceToken = await deploy('GovernanceToken', {
-//     from: deployer,
-//     args: [],
-//     log: true,
-//     waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
-//   })
+  log("Deploying GovernanceToken ...");
+  const governanceToken = await deploy('GovernanceToken', {
+    from: deployer,
+    args: [],
+    log: true,
+    waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
+  })
 
-//   log("Deploying GovernorContract ...");
-//   const { timeLock } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
-//   const governorContract = await deploy('GovernorContract', {
-//     from: deployer,
-//     args: [
-//       governanceToken.address,
-//       timeLock,
-//       VOTING_DELAY,
-//       VOTING_PERIOD,
-//       VOTING_THRESHOLD,
-//       QUORUM_PERCENTAGE,
-//     ],
-//     log: true,
-//     waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
-//   })
+  log("Deploying GovernorContract ...");
+  const { timeLock } = JSON.parse(fs.readFileSync("./network-settings.json", 'utf8'));
+  const governorContract = await deploy('GovernorContract', {
+    from: deployer,
+    args: [
+      governanceToken.address,
+      timeLock,
+      VOTING_DELAY,
+      VOTING_PERIOD,
+      VOTING_THRESHOLD,
+      QUORUM_PERCENTAGE,
+    ],
+    log: true,
+    waitConfirmations: networkConfig(network.name).blockConfirmations || 1,
+  })
 
-//   log(`GovernorContract deployed at: ${governorContract.address}`);
-//   const blockNumBefore = await ethers.provider.getBlockNumber();
-//   log(`BlockNumBeforeat: ${blockNumBefore}`);
+  const stringFile = fs.readFileSync("network-settings.json", "utf8");
+  const file = JSON.parse(stringFile);
+
+  if (typeof(file.verifyVoucher) !== 'string' || typeof(file.governor) !== 'string') {
+    let data = {
+      governor: governorContract.address,
+      timeLock: file.timeLock,
+      verifyVoucher: file.verifyVoucher,
+    };
+    let dictstring = JSON.stringify(data);
+    fs.writeFileSync("network-settings.json", dictstring);
+  }
+  log(`GovernorContract deployed at: ${governorContract.address}`);
+  const blockNumBefore = await ethers.provider.getBlockNumber();
+  log(`BlockNumBefore: ${blockNumBefore}`);
 };
 
 export default deployGovernorContract;

@@ -35,7 +35,7 @@ const deployVerifyVoucher: DeployFunction = async function (
   if (!checkIfFileOrDirectoryExists("network-settings.json")) {
     fs.appendFile(
       "network-settings.json",
-      JSON.stringify(data),
+      JSON.stringify({ [network.name]: data }),
       function (err) {
         if (err) {
           // append failed
