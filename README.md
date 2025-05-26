@@ -88,7 +88,7 @@ After computing Difficulty Score (typically scaled 0–100), new tokens are mint
 
 $$Tokens = Difficulty × BaseMultiplier × log₂(n + 1)$$
 
-- BaseMultiplier is a DAO-controlled constant (e.g. 10), scaling the raw score to token units. For example, with BaseMultiplier=10, a score of 50 yields $50\times10=500$ tokens before the log factor.
+- BaseMultiplier is a DAO-controlled constant (e.g. 2), scaling the raw score to token units. For example, with BaseMultiplier=2, a score of 50 yields $50\times2=100$ tokens before the log factor.
 - The $\log_2(n+1)$ term (where $n$ is the number of distinct donors on that need) ensures diminishing returns as more people contribute: doubling donors roughly adds a fixed bonus. This encourages collaboration without unbounded token inflation.
 
 This token formula links difficulty and community effort to rewards. By design it rewards users/community according to their contribution. 
