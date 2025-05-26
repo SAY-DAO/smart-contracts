@@ -95,7 +95,7 @@ This token formula links difficulty and community effort to rewards. By design i
 
 
 # Role-Based Token Splits
-Minted tokens are divided among roles so each part of the process is rewarded predictably. The fixed split is:
+Minted tokens are divided among roles so each part of the process is rewarded predictably. The current split is given in the following table, however these parameters can be updated by the DAO votes:
 
 
 | **Role**           | **Purpose**                                                     | **Token Share** |
@@ -103,7 +103,7 @@ Minted tokens are divided among roles so each part of the process is rewarded pr
 | **Social Worker**  | Created the need and verified the child’s requirements          | 20%             |
 | **Auditor**        | Reviewed and approved the legitimacy and compliance of the need | 15%             |
 | **Purchaser**      | Completed the transaction, ordering the item from a supplier    | 15%             |
-| **Virtual Family** | The **donor pool** who collaborated on paying for the need                 | 25%             |
+| **Virtual Family** | The **Virtual Family pool**, who collaborated on paying for the need                 | 25%             |
 | **Relative**          | Mint tokens form the signed needs                    | 25%             |
 ## Example - Token Split
 Let’s say a need scores Difficulty = 65, with 3 donors and BaseMultiplier = 2. Then:
@@ -117,5 +117,5 @@ $Tokens Minted=65×2×log2​(3+1)=65×2×2=260$
 | Virtual Family |         25% |      65.0 tokens |
 | Relative          |         25% |      65.0 tokens |
 
-# Donor Pool Distribution
+# Virtual Family Pool Distribution
 TBD
