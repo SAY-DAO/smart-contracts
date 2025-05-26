@@ -70,11 +70,13 @@ To illustrate, assume the DAO has decided initial weights: $t_c$ = 15%, $t_p$ = 
 
 **Why**: The five criteria above may not be equally important (e.g. price might matter more than delivery time). DAO members use AHP’s structured voting to set these weights.
 
-- **Pairwise voting:** DAO participants compare criteria two at a time using Saaty’s 1–9 scale 5 (1 = equal importance, 9 = one extremely more important). For example, a member might judge Price to be “5 times more important” than Order→Delivery time. Each comparison is aggregated (e.g., by geometric mean) into a group pairwise comparison matrix.
+- **Pairwise voting:** DAO participants compare criteria two at a time using Saaty’s 1–9 scale (1 = equal importance, 9 = one extremely more important). For example, a member might judge Price to be “5 times more important” than Order→Delivery time. Each comparison is aggregated (e.g., by geometric mean) into a group pairwise comparison matrix.
 
 - **Compute weights:** We compute the principal eigenvector of the matrix to obtain normalized weights $(w_{\text{tc}}, w_{\text{tp}}, w_{\text{to}}, w_{\text{td}}, w_{\text{price}} )$. This eigenvector reflects the relative importance of each criterion.
 
-- **Consistency check:** AHP quantifies judgment consistency via the Consistency Ratio (CR). A low CR (≤0.10) indicates logical consistency in the decision making. $$ CI = \frac{\lambda_{\max} - n}{n - 1}, \qquad CR = \frac{CI}{RI} $$
+- **Consistency check:** AHP quantifies judgment consistency via the Consistency Ratio (CR). A low CR (≤0.10) indicates logical consistency in the decision making.
+
+ $$ CI = \frac{\lambda_{\max} - n}{n - 1}, \qquad CR = \frac{CI}{RI} $$
   - $\lambda_{\max}$: The principal (largest) eigenvalue of the comparison matrix.
   - $n$: The number of criteria (matrix size, e.g. n=5).
   - $CI$: Consistency index.
