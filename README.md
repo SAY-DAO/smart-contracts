@@ -27,6 +27,7 @@ The overall Difficulty is then the weighted sum of these normalized scores, wher
 $$
 \mathrm{Difficulty} = w_{tc} \cdot N(t_c) + w_{tp} \cdot N(t_p) + w_{to} \cdot N(t_o) + w_{td} \cdot N(t_d) + w_{\text{price}} \cdot N(\text{price})
 $$
+
 where $N(x)$ is the normalized (percentile) score for each criterion. A higher difficulty means the need is harder or more resource-intensive to fulfill.
 
 
