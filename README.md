@@ -84,7 +84,7 @@ To illustrate, assume the DAO has decided initial weights: $t_c$ = 15%, $t_p$ = 
 
 
 # Token Minting and Allocation
-After computing Difficulty Score (typically scaled 0–100), new tokens are minted for that need. We denote a base mint factor B (e.g. 10 tokens per difficulty point, as an example set by DAO). Base tokens = B× (Difficulty Score). Then we apply a collaboration multiplier: if n donors contributed to the need, the DAO-minted reward is multiplied by log2 (n + 1). Thus:
+After computing Difficulty Score (typically scaled 0–100), new tokens are minted for that need. We denote a base mint factor B (e.g. 2 tokens per difficulty point, as an example set by DAO). Base tokens = B× (Difficulty Score). Then we apply a collaboration multiplier: if n donors contributed to the need, the DAO-minted reward is multiplied by log2 (n + 1). Thus:
 
 $$Tokens = Difficulty × BaseMultiplier × log₂(n + 1)$$
 
