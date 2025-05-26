@@ -113,7 +113,7 @@ $Tokens Minted=65×2×log2​(3+1)=65×2×2=260$
 | Auditor        |         15% |      39.0 tokens |
 | Purchaser      |         15% |      39.0 tokens |
 | Virtual Family |         25% |      65.0 tokens |
-| mamad          |         25% |      65.0 tokens |
+| Relative          |         25% |      65.0 tokens |
 
 # Donor Pool Distribution
 TBD
