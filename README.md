@@ -108,7 +108,7 @@ Minted tokens are divided among roles so each part of the process is rewarded pr
 ## Example - Token Split
 Let’s say a need scores Difficulty = 65, with 3 donors and BaseMultiplier = 2. Then:
 
-$Tokens Minted=65×2×log2​(3+1)=65×2×2=260$
+$Tokens Minted=65×2×log₂(3+1)=65×2×2=260$
 | **Role**       | **Share %** | **Token Amount** |
 | -------------- | ----------: | ---------------: |
 | Social Worker  |         20% |      52.0 tokens |
