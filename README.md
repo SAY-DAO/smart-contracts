@@ -32,7 +32,7 @@ where $N(x)$ is the normalized (percentile) score for each criterion. A higher d
 
 
 ## Example
-To illustrate, assume the DAO has decided initial weights: $w_c$ = 15%, $w_p$ = 15%, $w_o$ = 10%, $w_d$ = 10%, $ w_{\text{price}}$ = 50%. 
+To illustrate, assume the DAO has decided initial weights: $w_c$ = 15%, $w_p$ = 15%, $w_o$ = 10%, $w_d$ = 10%, $ w_{\text{price}} $ = 50%. 
 
 |     **Need**    | **$t_c$ (days)** | **$t_p$ (days)** | **$t_o$ (days)** | **$t_d$ (days)** | **$Price$ (USD)** |
 | :-------------: | --------------: | --------------: | --------------: | --------------: | --------------: |
