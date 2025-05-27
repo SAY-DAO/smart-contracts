@@ -25,14 +25,14 @@ $$
 The overall Difficulty is then the weighted sum of these normalized scores, where $w_x$ are the criterion weights from AHP (see Weighting via AHP section).
 
 $$
-\mathrm{Difficulty} = w_{tc} \cdot N(t_c) + w_{tp} \cdot N(t_p) + w_{to} \cdot N(t_o) + w_{td} \cdot N(t_d) + w_{\text{price}} \cdot N(\text{price})
+\mathrm{Difficulty} = w_{t_c} \cdot N(t_c) + w_{tp} \cdot N(t_p) + w_{t_o} \cdot N(t_o) + w_{t_d} \cdot N(t_d) + w_{\text{price}} \cdot N(\text{price})
 $$
 
 where $N(x)$ is the normalized (percentile) score for each criterion. A higher difficulty means the need is harder or more resource-intensive to fulfill.
 
 
 ## Example
-To illustrate, assume the DAO has decided initial weights: $w_{tc}$ = 15%, $w_{tp}$ = 15%, $w_{to}$ = 10%, $w_{td}$ = 10%, $w_{\text{price}}$ = 50%. 
+To illustrate, assume the DAO has decided initial weights: $w_{t_c}$ = 15%, $w_{t_p}$ = 15%, $w_{t_o}$ = 10%, $w_{t_d}$ = 10%, $w_{\text{price}}$ = 50%. 
 
 |     **Need**    | **$t_c$ (days)** | **$t_p$ (days)** | **$t_o$ (days)** | **$t_d$ (days)** | **$Price$ (USD)** |
 | :-------------: | --------------: | --------------: | --------------: | --------------: | --------------: |
