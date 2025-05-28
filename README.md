@@ -70,7 +70,7 @@ for $t_c$ we get:
 | **Sports Kit** |  9  |            5            |         4         |               $4/4 = 1.00$               |  100%  |  0%  |
 
 
-we do same for other criteria:
+we do the same for other criteria:
 
 | **Criteria**                  |  **Wt**  | **Medical Kit** | **School Supplies** | **Food Package** | **Clothes** | **Sports Kit** |
 | ----------------------------- | :------: | --------------: | ------------------: | ---------------: | ----------: | -------------: |
