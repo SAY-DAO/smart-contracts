@@ -59,6 +59,8 @@ To illustrate, assume the DAO has decided initial weights: $w_{t_c}$ = 15%, $w_{
 
 - 9 days → 0% (Sports Kit) → rank 5
 
+for $t_c$ we get:
+
 | Need | $t_c$ | rank $\mathrm{rank}(t_c)$ | $\mathrm{rank}-1$ | $\displaystyle\frac{\mathrm{rank}-1}{4}$ | $P(t_c)$ | $N(t_c)$ |
 | :-: | :-: | :---------------------: | :---------------: | :--------------------------------------: | :----: | :----: |
 |  Medical Kit  |  1  |            1            |         0         |               $0/4 = 0.00$               |   0%   |   100%   |
@@ -67,6 +69,8 @@ To illustrate, assume the DAO has decided initial weights: $w_{t_c}$ = 15%, $w_{
 |  Clothes  |  7  |            4            |         3         |               $3/4 = 0.75$               |   75%  |   25%  |
 |  Sports Kit |  9  |            5            |         4         |               $4/4 = 1.00$               |  100%  |  0%  |
 
+
+we do same for other criteria:
 
 | **Criteria**                  |  **Wt**  | **Medical Kit** | **School Supplies** | **Food Package** | **Clothes** | **Sports Kit** |
 | ----------------------------- | :------: | --------------: | ------------------: | ---------------: | ----------: | -------------: |
