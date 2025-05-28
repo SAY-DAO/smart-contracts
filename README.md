@@ -49,15 +49,24 @@ To illustrate, assume the DAO has decided initial weights: $w_{t_c}$ = 15%, $w_{
 
 **calculation example**: $t_c$ Values sorted ascending: [1, 3, 5, 7, 9]. percentiles(normal) = [0, 25, 50, 75, 100]. inverted = [100, 75, 50, 25, 0].
 
-- 1 day → 100% (Medical Kit)
+- 1 day → 100% (Medical Kit) → rank 1
 
-- 3 days → 75% (Food Package)
+- 3 days → 75% (Food Package) → rank 2
 
-- 5 days → 50% (School Supplies)
+- 5 days → 50% (School Supplies) → rank 3
 
-- 7 days → 25% (Clothes)
+- 7 days → 25% (Clothes) → rank 4
 
-- 9 days → 0% (Sports Kit)
+- 9 days → 0% (Sports Kit) → rank 5
+
+| Need | $t_c$ | rank $\mathrm{rank}(t_c)$ | $\mathrm{rank}-1$ | $\displaystyle\frac{\mathrm{rank}-1}{4}$ | $P(t_c)$ | $N(t_c)$ |
+| :-: | :-: | :---------------------: | :---------------: | :--------------------------------------: | :----: | :----: |
+|  Medical Kit  |  1  |            1            |         0         |               $0/4 = 0.00$               |   0%   |   100%   |
+|  Food Package |  3  |            2            |         1         |               $1/4 = 0.25$               |   25%  |   75%  |
+|  School Supplies |  5  |            3            |         2         |               $2/4 = 0.50$               |   50%  |   50%  |
+|  Clothes  |  7  |            4            |         3         |               $3/4 = 0.75$               |   75%  |   25%  |
+|  Sports Kit |  9  |            5            |         4         |               $4/4 = 1.00$               |  100%  |  0%  |
+
 
 | **Criteria**                  |  **Wt**  | **Medical Kit** | **School Supplies** | **Food Package** | **Clothes** | **Sports Kit** |
 | ----------------------------- | :------: | --------------: | ------------------: | ---------------: | ----------: | -------------: |
