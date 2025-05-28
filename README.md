@@ -14,7 +14,7 @@ Each need is scored using five metrics:
 - **Order→Delivery time ($t_d $),**
 - **Need Price.**
 
-Each raw metric is first normalized to a 0–100 percentile scale (0 = lowest, 100 = highest). For time-based metrics we invert the percentile so that shorter times give higher difficulty (e.g.  $N(t_x) = 100 - \text{percentile}(t)$ ), whereas price uses the normal percentile (higher price → higher difficulty). A percentile provides insight about where a value lies within a data set by revealing the percentage of data points below or equal to a specific value. This means if a need’s price is at the 90th percentile, it is higher than 90% of recent prices (so very costly).
+Each raw metric is first normalized to a 0–100 percentile scale (0 = lowest, 100 = highest). For time-based metrics we invert the percentile so that shorter times give higher difficulty (e.g.  $N(t_x) = 100 - \text{percentile}(t_c)$ ), whereas price uses the normal percentile (higher price → higher difficulty). A percentile provides insight about where a value lies within a data set by revealing the percentage of data points below or equal to a specific value. This means if a need’s price is at the 90th percentile, it is higher than 90% of recent prices (so very costly).
 
 ```math
 P(x) = 100 \times \frac{\text{rank}(x) - 1}{N - 1}
