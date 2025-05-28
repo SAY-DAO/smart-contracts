@@ -20,7 +20,7 @@ Each raw metric is first normalized to a 0–100 percentile scale (0 = lowest, 1
 P(x) = 100 \times \frac{\text{rank}(x) - 1}{N - 1}
 ```
 
-The overall Difficulty is then the weighted sum of these normalized scores, where $w_x$ are the criterion weights from AHP (see Weighting via AHP section).
+The overall Difficulty is then the weighted sum of these scores, where $w_x$ are the criterion weights from AHP (see Weighting via AHP section).
 
 ```math
 \mathrm{Difficulty}
