@@ -14,19 +14,23 @@ Each need is scored using five metrics:
 - **Order→Delivery time ($t_d $),**
 - **Need Price.**
 
-Each raw metric is first normalized to a 0–100 percentile scale (0 = lowest, 100 = highest). For time-based metrics we invert the percentile so that shorter times give higher difficulty (e.g.  $score = 100 - \text{percentile}(t)$ ), whereas price uses the normal percentile (higher price → higher difficulty). A percentile provides insight about where a value lies within a data set by revealing the percentage of data points below or equal to a specific value. This means if a need’s price is at the 90th percentile, it is higher than 90% of recent prices (so very costly).
+Each raw metric is first normalized to a 0–100 percentile scale (0 = lowest, 100 = highest). For time-based metrics we invert the percentile so that shorter times give higher difficulty (e.g.  $N(t_x) = 100 - \text{percentile}(t)$ ), whereas price uses the normal percentile (higher price → higher difficulty). A percentile provides insight about where a value lies within a data set by revealing the percentage of data points below or equal to a specific value. This means if a need’s price is at the 90th percentile, it is higher than 90% of recent prices (so very costly).
 
-Thus we map each raw metric into a 0–100 difficulty subscore. For example, if most needs are delivered in 3–7 days and one took only 1 day, that 1-day case is in a low time percentile (fast), so we invert it to a high difficulty score. Conversely, a very expensive item (e.g. 10th percentile in price) gets a high difficulty score. This puts all metrics on the same 0–100 scale for aggregation.
-
-$$
-N(x) = \frac{x - x_{\min}}{x_{\max} - x_{\min}}
-$$
+```math
+P(x) = 100 \times \frac{\text{rank}(x) - 1}{N - 1}
+```
 
 The overall Difficulty is then the weighted sum of these normalized scores, where $w_x$ are the criterion weights from AHP (see Weighting via AHP section).
 
-$$
-\mathrm{Difficulty} = w_{t_c} \cdot N(t_c) + w_{tp} \cdot N(t_p) + w_{t_o} \cdot N(t_o) + w_{t_d} \cdot N(t_d) + w_{\text{price}} \cdot N(\text{price})
-$$
+```math
+\mathrm{Difficulty}
+= w_{t_c}\,N(t_c)
++ w_{t_p}\,N(t_p)
++ w_{t_o}\,N(t_o)
++ w_{t_d}\,N(t_d)
++ w_{\text{price}}\,P(\text{price})
+```
+
 
 where $N(x)$ is the normalized (percentile) score for each criterion. A higher difficulty means the need is harder or more resource-intensive to fulfill.
 
@@ -119,3 +123,86 @@ $Tokens Minted=65×2×log₂(3+1)=65×2×2=260$
 
 # Virtual Family Pool Distribution
 TBD
+---
+Thanks! I’ll now prepare a detailed mathematical breakdown of both percentile ranking and Mahalanobis distance for multivariate, skewed role-based performance comparison. This will include:
+
+* Fully derived equations for each method
+* Step-by-step numeric examples
+* Visual representations (plots, contours)
+* Notes on robustness (log/rank transforms, robust estimators like MCD if needed)
+
+I’ll let you know once the full detailed breakdown is ready.
+
+
+# Multivariate Ranking of Users: Percentile vs Mahalanobis Methods
+
+We compare two approaches to ranking users who have two metrics (tasks completed and cost per task) under skewed distributions.  Percentile ranking is a nonparametric method that converts each metric to a relative score based on its rank among peers.  The Mahalanobis distance is a multivariate metric that measures how far each user’s 2D (tasks,cost) point lies from the group mean, taking account of covariance.  We show formal definitions, derive formulas, give numeric examples, and discuss robustness and interpretation for skewed data.
+
+## 1. Percentile Ranking
+
+**Definition (Percentile).**  Informally, the *p*-th percentile of a dataset is the value below which *p*% of the data fall.  Equivalently, the *percentile rank* of a data point is the percentage of values at or below it.  Formally, for a sample of size *N* with sorted values $X\_{(1)}\le X\_{(2)}\le\cdots\le X\_{(N)}$, one common method (Hyndman–Fan type-8) computes a (possibly fractional) rank $h=(N+1)\times p/100$, and interpolates linearly between $X\_{\lfloor h\rfloor}$ and $X\_{\lceil h\rceil}$.  For example, if \$h=3.5\$, one takes 50% of the way between the 3rd and 4th ordered values.  Equivalently, simpler formulas like  $\text{PercentileRank} = \frac{i-0.5}{N}\times100\%,\quad i=\text{rank index}$
+assigns the *i*-th data value a percentile of \$(i-0.5)/N\$, producing percentiles from about $0%\$ up to \$100%\$ (with none exactly $0%\$ or \$100%\$ under this definition).  In any case, the rule ensures the *P*th percentile lies near rank $\tfrac{P}{100}(N+1)$.
+
+**Ties and Interpolation.**  When multiple values tie, one can assign each tied value the same percentile range or take the average rank.  With small samples or many ties, methods like the Harrell–Davis estimator (based on the beta distribution) provide smooth quantile estimates.  In practice, most software uses linear interpolation: if \$h\$ is fractional, set $P_p = X_{(\lfloor h\rfloor)} + (h - \lfloor h\rfloor)\Bigl(X_{(\lfloor h\rfloor+1)} - X_{(\lfloor h\rfloor)}\Bigr).$  For example, if \$X\_{(3)}=50\$ and \$X\_{(4)}=80\$ and \$h=3.5\$, then the 50th percentile would be \$50 + 0.5(80-50)=65\$.  This ensures a unique percentile even for small *N*.
+
+**Numeric Example – Single Metric.**  Suppose six users have tasks completed: $\[10,20,50,80,150,200]\$.  Sorting gives \$X\_{(1)}=10,\dots,X\_{(6)}=200\$.  Applying the percentile formula \$PR\_i = (i-0.5)/6\$ yields percentiles (approximately) $10\to 8.3\%,\;20\to 25\%,\;50\to 41.7\%,\;80\to 58.3\%,\;150\to 75\%,\;200\to 91.7\%.$  Thus the user with 50 tasks is around the 42nd percentile among peers.  (Different percentile conventions may give slightly different numbers, but all agree on relative ordering.)
+
+**Combining Percentiles for Two Metrics.**  To rank on two metrics (e.g. *tasks* and *cost*), first convert each metric separately to a percentile.  Care must be taken with direction: here *more tasks* is better, but *lower cost* is better.  We therefore take the cost percentiles in the *opposite* sense (e.g. define “cost efficiency” = negative cost or use 100 minus the percentile of cost) so that higher percentile = better.  In our example we had tasks percentiles above; for costs $\[300,50,40,100,70,20]\$, sorting ascending gives percentiles \$20\to8.3%,40\to25%,50\to41.7%,70\to58.3%,100\to75%,300\to91.7%\$.  Since low cost is good, we use \$100-\text{cost\_percentile}\$ as a performance score.  Now each user has two percentile scores (one for tasks, one for cost-efficiency).  A simple combined score is the average of these two percentiles.  For instance, using the data above:
+
+| User | Tasks | Cost | Tasks PR (%) | Cost PR (%) | Combined PR = (Tasks+Cost)/2 (%) |
+| ---- | ----- | ---- | ------------ | ----------- | -------------------------------- |
+| A    | 10    | 300  | 8.3          | 8.3         | 8.3                              |
+| B    | 20    | 50   | 25.0         | 58.3        | 41.7                             |
+| C    | 50    | 40   | 41.7         | 75.0        | 58.3                             |
+| D    | 80    | 100  | 58.3         | 25.0        | 41.7                             |
+| E    | 150   | 70   | 75.0         | 41.7        | 58.3                             |
+| F    | 200   | 20   | 91.7         | 91.7        | 91.7                             |
+
+Here user F scores highest (91.7%) and A lowest (8.3%) on the combined percentile.  (Note: sums/averages of percentiles implicitly weight each metric equally.  One could also use weighted sums or other aggregates.  Percentile combination treats each metric on a common relative scale, which helps when metrics have different units or skewed ranges.)
+
+**Visualization.**  A percentile-based ranking can be visualized via *percentile bands* or an *empirical CDF*.  For each metric, one can draw a histogram or density of raw scores and mark vertical lines at percentiles of interest, showing how values map to percentile positions.  Alternatively, plotting the empirical cumulative distribution function (ECDF) illustrates the percentile relationship directly: each user’s score maps to the fraction of data below it.  (Because percentiles are rank-based, the method is robust to non-normal or skewed distributions.)
+
+## 2. Mahalanobis Distance
+
+**Definition (Mahalanobis Distance).**  Given a multivariate distribution with mean vector \$\boldsymbol\mu\$ and covariance matrix \$\Sigma\$, the Mahalanobis distance of a point \$\mathbf{x}\$ is defined by
+$d_M(\mathbf{x}) = \sqrt{(\mathbf{x}-\boldsymbol\mu)^T\,\Sigma^{-1}\,(\mathbf{x}-\boldsymbol\mu)}\,.$
+Equivalently, the squared distance is \$d\_M^2 = (\mathbf{x}-\boldsymbol\mu)^T\Sigma^{-1}(\mathbf{x}-\boldsymbol\mu)\$.  This measures distance after “whitening” the data: if \$\Sigma=S^TS\$ then \$d\_M(\mathbf{x})=|S^{-1}(\mathbf{x}-\boldsymbol\mu)|\$, i.e. the Euclidean norm in transformed space.  Unlike simple Euclidean distance, Mahalanobis accounts for correlations and differing variances in the dimensions.
+
+**Derivation.**  The Mahalanobis formula arises from the multivariate normal distribution and the idea of contours of constant likelihood.  In matrix form, for two 2D points \$\mathbf{x},\mathbf{y}\$, one also has \$d\_M(\mathbf{x},\mathbf{y}) = \sqrt{(\mathbf{x}-\mathbf{y})^T\Sigma^{-1}(\mathbf{x}-\mathbf{y})}\$.  Hence the mean \$\boldsymbol\mu\$ is effectively a “center” of the data and \$\Sigma\$ defines how distance is scaled in each direction.  In particular, level sets of constant \$d\_M\$ are ellipsoids: \${\mathbf{x}: (\mathbf{x}-\boldsymbol\mu)^T\Sigma^{-1}(\mathbf{x}-\boldsymbol\mu)=c^2}\$ are ellipses whose axes align with the eigenvectors of \$\Sigma\$.
+
+“Contours” of Mahalanobis distance can be visualized: for example, Figure 1 (from Tretherington 2021) shows ellipses of equal Mahalanobis-distance probability.  The purple ellipse is based on the sample mean and covariance, whereas cyan/orange show robust versions (MCD/MVE) that focus on dense clusters.
+
+&#x20;*Figure: Elliptical contours of Mahalanobis distance around the sample mean (purple) versus robust estimates (cyan/orange).  Equal-distance contours form ellipsoids determined by the covariance.*
+
+**Numeric Example.**  Using the same 6-user data, let \$\mathbf{x}=(\text{tasks},\text{cost})\$ and compute the sample mean \$\boldsymbol\mu=(85,96.67)\$ and covariance matrix \$\Sigma\$ (with entries in appropriate units).  For each user \$i\$ we compute the Mahalanobis distance \$d\_i = \sqrt{(\mathbf{x}\_i-\boldsymbol\mu)^T\Sigma^{-1}(\mathbf{x}\_i-\boldsymbol\mu)}\$.  For our data one finds (rounded)
+
+| User | Tasks | Cost | \$\mathbf{x}-\boldsymbol\mu\$ | \$d\_M\$ (Mahalanobis) |
+| ---- | ----- | ---- | ----------------------------- | ---------------------- |
+| A    | 10    | 300  | \$(-75, +203.3)\$             | 1.97                   |
+| B    | 20    | 50   | \$(-65, -46.7)\$              | 1.38                   |
+| C    | 50    | 40   | \$(-35, -56.7)\$              | 1.05                   |
+| D    | 80    | 100  | \$(-5, +3.3)\$                | 0.07                   |
+| E    | 150   | 70   | \$(+65, -26.7)\$              | 0.89                   |
+| F    | 200   | 20   | \$(+115, -76.7)\$             | 1.52                   |
+
+*(Here \$d\_M\$ is computed with the above mean and covariance.  For instance, user A has \$\mathbf{x}-\boldsymbol\mu=\[-75,;203.3]\$ and \$d\_M\approx1.97\$.)*
+
+From these distances, smaller is “better” (closer to the group center).  In this example the ordering (best to worst) by Mahalanobis distance is D (0.07), E (0.89), C (1.05), B (1.38), F (1.52), A (1.97).  This differs from the percentile-aggregate ranking: for instance, user F (200 tasks, cost 20) was best by percentiles but has a high Mahalanobis distance because its task count is an extreme outlier relative to the covariance structure.
+
+**Robustness and Transformations.**  The usual Mahalanobis distance assumes approximately Gaussian data and uses the sample mean and covariance.  If the data are skewed or have outliers, one can first transform or use robust estimates.  A common step is a *logarithmic transform* on skewed metrics: e.g. work in \$\log(\text{tasks})\$ or \$\log(\text{cost})\$ so that the distribution is more symmetric.  (Indeed, some outlier-detection pipelines apply \$\log\$ because “Mahalanobis’ distance requires symmetrical data, so a log transform is applied”.)  Alternatively, one can replace the raw values by ranks or percentiles (effectively a nonparametric transform to uniform) before computing distances.  After transformation, compute the mean and covariance of the transformed data and apply the Mahalanobis formula.
+
+Another approach is *robust covariance estimation*.  The Minimum Covariance Determinant (MCD) method finds the subset of \$\lfloor(N+N\_{\rm dim}+1)/2\rfloor\$ observations whose covariance has the smallest determinant, and uses that subset to compute a robust mean \$\mu\_r\$ and scatter \$\Sigma\_r\$.  Then one uses \$d\_M(\mathbf{x};\mu\_r,\Sigma\_r)\$ instead of the classical version.  MCD has a high breakdown point and is affine-equivariant.  In practice this yields Mahalanobis distances that are less influenced by outliers in the data.  (Figure 1’s cyan ellipses illustrate MCD-based contours.)
+
+In summary, to robustify Mahalanobis: (1) apply transformations (e.g. log or rank) to reduce skew and bound the data; (2) use a robust estimator like MCD for \$\mu,\Sigma\$; (3) optionally apply a break-point test against a \$\chi^2\$ distribution if using distances for outlier detection.
+
+## 3. Comparison and Recommendations
+
+**Percentile Ranking** is simple, nonparametric, and intuitive: each user gets a score (0–100) per metric.  It automatically handles skewed data (no normality needed) and is robust to outliers in that extreme values simply get near-0% or near-100%.  It works well when only *relative* positions matter.  However, combining metrics by averaging percentiles implicitly assumes equal weights and independence of metrics.  It also loses information about the joint distribution – for example, two users might have the same average percentile but very different trade-offs between tasks and cost.
+
+**Mahalanobis Distance** is fully multivariate: it captures correlations between metrics and measures “outlierness” from the center.  It is appropriate if the data are roughly ellipsoid-shaped and one cares about overall deviation.  In our example, Mahalanobis ranked user F lower than percentile did, because F’s high tasks were unusual relative to others.  Mahalanobis also yields a single continuous score, and distance contours (ellipses) provide a geometric interpretation.  However, it assumes (or is most interpretable for) data that are not extremely skewed; heavy tails can inflate distances.  Robustifying via log transforms or MCD (as above) mitigates this.
+
+**When to use which:**  If the goal is simply to rank by each metric equally and combine them transparently, percentiles (possibly averaged or Pareto-ranked) are a fair, distribution-free choice.  They preserve the idea of “better than *x*% of peers.”  Use them when you want interpretability in percentile terms and have no strong assumption about joint distribution.  If the joint distribution is important (e.g. one is concerned about multidimensional outliers or overall efficiency), and if data are not extremely skewed (or have been transformed), Mahalanobis distance (possibly robustified) can give a more principled multivariate ranking.  In practice, one could even combine approaches: e.g. use percentiles to score each dimension, then compute a Mahalanobis-like distance in the *percentile space* (though note percentiles are not metric), or use Mahalanobis but report percentile ranks of the resulting distances for interpretation.
+
+**Conclusions:**  Percentile rankings provide a simple, robust relative scoring of each metric (0–100 scale) that handles skew by construction.  Mahalanobis distance provides a unified multivariate distance that accounts for covariance.  Both methods can be applied to the same data (as shown above) to yield potentially different rankings.  The choice depends on whether one wants a purely rank-based, nonparametric comparison (percentiles) or a covariance-weighted distance measure (Mahalanobis, robustified if needed).
+
+**References:** Authoritative sources define percentiles and interpolation and explain Mahalanobis distance and robust covariance, while example figures illustrate their behavior.
