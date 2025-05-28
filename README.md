@@ -32,7 +32,7 @@ The overall Difficulty is then the weighted sum of these normalized scores, wher
 ```
 
 
-where $N(x)$ is the normalized (percentile) score for each criterion. A higher difficulty means the need is harder or more resource-intensive to fulfill.
+where $P(x)$ is the normalized (percentile) score for each criterion. A higher difficulty means the need is harder or more resource-intensive to fulfill.
 
 
 ## Example
