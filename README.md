@@ -103,7 +103,7 @@ we do the same for other criteria:
 # Token Minting and Allocation
 After computing Difficulty Score (typically scaled 0–100), new tokens are minted for that need. We denote a base mint factor B (e.g. 2 tokens per difficulty point, as an example set by DAO). Then we apply a collaboration multiplier: if $v$ virtual families contributed to the need, the DAO-minted reward is multiplied by $log_2 (v + 1)$. Thus:
 
-$$Tokens = Difficulty × BaseMultiplier × log₂(v + 1)$$
+$$Tokens = Difficulty × BaseMultiplier × log_2(v + 1)$$
 
 - BaseMultiplier is a DAO-controlled constant (e.g. 2), scaling the raw score to token units. For example, with BaseMultiplier=2, a score of 50 yields $50\times2=100$ tokens before the log factor.
 - The $\log_2(v+1)$ term (where $n$ is the number of distinct donors on that need) ensures diminishing returns as more people contribute: doubling donors roughly adds a fixed bonus. This encourages collaboration without unbounded token inflation.
