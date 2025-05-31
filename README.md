@@ -101,14 +101,14 @@ we do the same for other criteria:
 
 
 # Token Minting and Allocation
-After computing Difficulty Score (typically scaled 0–100), new tokens are minted for that need. We denote a base mint factor B (e.g. 2 tokens per difficulty point, as an example set by DAO). Base tokens = B× (Difficulty Score). Then we apply a collaboration multiplier: if n donors contributed to the need, the DAO-minted reward is multiplied by log2 (n + 1). Thus:
+After computing Difficulty Score (typically scaled 0–100), new tokens are minted for that need. We denote a base mint factor B (e.g. 2 tokens per difficulty point, as an example set by DAO). Then we apply a collaboration multiplier: if $v$ virtual families contributed to the need, the DAO-minted reward is multiplied by $log_2 (v + 1)$. Thus:
 
-$$Tokens = Difficulty × BaseMultiplier × log₂(n + 1)$$
+$$Tokens = Difficulty × BaseMultiplier × log₂(v + 1)$$
 
 - BaseMultiplier is a DAO-controlled constant (e.g. 2), scaling the raw score to token units. For example, with BaseMultiplier=2, a score of 50 yields $50\times2=100$ tokens before the log factor.
-- The $\log_2(n+1)$ term (where $n$ is the number of distinct donors on that need) ensures diminishing returns as more people contribute: doubling donors roughly adds a fixed bonus. This encourages collaboration without unbounded token inflation.
+- The $\log_2(v+1)$ term (where $n$ is the number of distinct donors on that need) ensures diminishing returns as more people contribute: doubling donors roughly adds a fixed bonus. This encourages collaboration without unbounded token inflation.
 
-This token formula links difficulty and community effort to rewards. By design it rewards users/community according to their contribution. 
+This token formula links difficulty and community effort to rewards. By design it rewards users/community according to their contribution. The more effective all parties are on delivering a need the more token is mined for that particular need.
 
 
 # Role-Based Token Splits
@@ -132,7 +132,7 @@ $Tokens Minted=65×2×log₂(3+1)=65×2×2=260$
 | Auditor        |         15% |      39.0 tokens |
 | Purchaser      |         15% |      39.0 tokens |
 | Virtual Family |         25% |      65.0 tokens |
-| Relative          |         25% |      65.0 tokens |
+| Relative       |         25% |      65.0 tokens |
 
 # Virtual Family Pool Distribution
 TBD
