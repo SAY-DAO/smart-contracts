@@ -187,7 +187,7 @@ $$
  2. Sum all Individual Multiplier values (only where Performance > 50):
 
 $$
-\sum_{i \text{ where Perf}_i > 50} \text{Individual-Multiplier}_i
+\text{TotalMultiplier}_{\text{summed}}=\sum_{i \text{ where Perf}_i > 50} \text{Individual-Multiplier}_i
 $$
 
 
