@@ -182,6 +182,7 @@ By using percentiles, we naturally accommodate skewed distributions—if one aun
 $$
 \text{Individual Multiplier}_i= \max(0, \frac{Performance_i​−50}{50}) \quad(\text{range: }0 \text{–} 1).
 $$
+
  2. Sum all Individual Multiplier values (only where Performance > 50):
 
 $$
@@ -189,6 +190,7 @@ $$
 \;=\;
 \sum_{i:\,\mathrm{Perf}_i > 50} \text{Individual Multiplier}_i
 $$
+
  3. Apply Cap, A DAO-governed cap to prevent excessive inflation.:
 
 $$
