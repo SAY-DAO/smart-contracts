@@ -188,8 +188,8 @@ $$
 
 $$
 \mathrm{TotalMultiplier}_{\mathrm{summed}}
-\;=\;
-\sum_{i:\,\mathrm{Perf}_i > 50}
+\;=\
+\sum_{i:\,\mathrm{Perf}_i > 50} \text{Individual Multiplier}_i
 $$
 
  3. Apply Cap, A DAO-governed cap to prevent excessive inflation.:
