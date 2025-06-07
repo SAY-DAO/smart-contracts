@@ -154,8 +154,9 @@ For each virtual family member the system collects two primary metrics **over th
 2. **Total count of Needs Funded ($C$)**
 
    * The number of distinct child needs the user helped fund in **that role** over the last 30 days.
+
   $$
-    P_C(\text{user}) \;=\; 100 \times \frac{(\text{rank of user by }C) - 1}{M - 1},
+    P_C(\text{user}) \;=\; 100 \times \frac{(\text{rank of user by }C) - 1}{M - 1}
   $$
 
 
