@@ -156,22 +156,22 @@ For each virtual family member the system collects two primary metrics **over th
    * The number of distinct child needs the user helped fund in **that role** over the last 30 days.
 
   $$
-  P_C(\text{user}) \;=\; 100 \times \frac{(\text{rank of user by }C) - 1}{M - 1}
+  P_C(\text{user}) = 100 \times \frac{(\text{rank of user by }C) - 1}{M - 1}
   $$
 
 
 
-where $M$ is the total number of active users in that role in last 30 days. Users are sorted ascending by $A$ and $C$. Once we have ,$P_A$ and, $P_C$ for a given user—both between 0 and 100, we combine them into a single Performance percentile:
+where $M$ is the total number of active users in that role in last 30 days. Users are sorted ascending by $A$ and $C$. Once we have, $P_A$ and, $P_C$ for a given user—both between 0 and 100, we combine them into a single Performance percentile:
 
 $$
-\text{Performance}_= \frac{P_A + P_C}{2} \quad(\text{range: }0 \text{–} 100).
+\text{Performance} = \frac{P_A + P_C}{2} \quad(\text{range: }0 \text{–} 100).
 $$
 
 
 
 An **above-average contributor** is any user whose Performance percentile **exceeds 50** (i.e. strictly greater than the median among all peers in that role). In other words:
 
-* **Above Average** ⇔ $ \text{Performance} > 50$.
+* **Above Average** ⇔ $\text{Performance} \gt 50$.
 * **At or Below Average** ⇔ $\text{Performance} \le 50$.
 
 By using percentiles, we naturally accommodate skewed distributions—if one aunt contributes $5,000 while most others give $100, she might be at the 99th percentile, and that top-percentile ranking is what matters for boosting rewards.
