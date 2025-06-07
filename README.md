@@ -187,8 +187,7 @@ $$
  2. Sum all Individual Multiplier values (only where Performance > 50):
 
 $$
-\text{TotalMultiplier}_{\text{summed}} =
-\sum_{\text{ i  where Perf}_i > 50} \text{Individual Multiplier}_i
+\text{TotalMultiplier}_{\text{summed}}=\sum_{\text{ i  where Perf}_i > 50} \text{Individual Multiplier}_i
 $$
 
  3. Apply Cap, A DAO-governed cap to prevent excessive inflation.:
