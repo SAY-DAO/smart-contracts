@@ -188,7 +188,7 @@ $$
 
 $$
 \mathrm{TotalMultiplier}_{\mathrm{summed}}
-=
+\;=\;
 \sum_{i:\,\mathrm{Perf}_i > 50} \text{Individual Multiplier}_i
 $$
 
