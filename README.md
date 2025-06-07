@@ -171,7 +171,7 @@ $$
 
 An **above-average contributor** is any user whose Performance percentile **exceeds 50** (i.e. strictly greater than the median among all peers in that role). In other words:
 
-* **Above Average** ⇔$ \text{Performance} > 50$.
+* **Above Average** ⇔ $ \text{Performance} > 50$.
 * **At or Below Average** ⇔ $\text{Performance} \le 50$.
 
 By using percentiles, we naturally accommodate skewed distributions—if one aunt contributes $5,000 while most others give $100, she might be at the 99th percentile, and that top-percentile ranking is what matters for boosting rewards.
