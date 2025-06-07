@@ -189,7 +189,7 @@ $$
 
 <p align="center">
   <img
-    src="https://latex.codecogs.com/svg.image?\displaystyle\color{white}\mathrm{TotalMultiplier}_{\mathrm{summed}}%20=%20\sum_{\substack{i=1\\\mathrm{Performance}_i>50}}^{n}%20\mathrm{IndividualMultiplier}_i"
+    src="https://latex.codecogs.com/svg.image?\displaystyle\mathrm{TotalMultiplier}_{\mathrm{summed}}%20=%20\sum_{\substack{i=1\\\mathrm{Performance}_i>50}}^{n}%20\mathrm{IndividualMultiplier}_i"
     alt="TotalMultiplier = sum over i=1 to n where Performance_i > 50" />
 </p>
 
