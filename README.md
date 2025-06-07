@@ -24,10 +24,10 @@ The overall Difficulty is then the weighted sum of these scores, where $w_x$ are
 
 ```math
 \mathrm{Difficulty}
-= w_{t_c}\,N(t_c)
-+ w_{t_p}\,N(t_p)
-+ w_{t_o}\,N(t_o)
-+ w_{t_d}\,N(t_d)
+= w_{t_c}\,P_{\mathrm{inv}}(t_c)
++ w_{t_p}\,P_{\mathrm{inv}}(t_p)
++ w_{t_o}\,P_{\mathrm{inv}}(t_o)
++ w_{t_d}\,P_{\mathrm{inv}}(t_d)
 + w_{\text{price}}\,P(\text{price})
 ```
 
