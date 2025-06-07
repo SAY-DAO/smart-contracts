@@ -24,8 +24,9 @@
 * [Virtual Family Pool Distribution](#virtual-family-pool-distribution)
 
 # Intro
-This document explains how we quantify and reward the complexity of delivering needs to children using a transparent, DAO-governed Analytic Hierarchy Process (AHP). You’ll find definitions, formulas, examples, and governance details organized into the sections below.
+In this document, we present a comprehensive, DAO-governed framework for quantifying and rewarding the effort involved in fulfilling “needs” within a tokenized ecosystem. Building upon the analytic hierarchy process (AHP) methodology and sustainability principles originally developed by Kim, Hong, and Majer in their study of value-driven token economies on blockchain platforms [[link](https://www.mdpi.com/1999-5903/16/5/178)], we extend that approach to a broader, need-fulfillment context.
 
+By integrating AHP’s structured decision-making with on-chain governance, our framework not only quantifies effort in a transparent, adaptable manner but also embeds democratic accountability at every stage of token issuance and distribution.
 # Difficulty Score 
 Every step from discovering to delivering a need to a child vary widely in complexity and urgency. Our token-reward system quantify each need’s difficulty and reward all participants appropriately. We use the Analytic Hierarchy Process (AHP) to combine multiple difficulty factors into a single score. Delivered needs with higher difficulty generate more tokens, scaled by a multiplier and the number of virtual families involved. All parameters that determine the difficulty score of a need (weights, caps, splits, etc.) are governed by the DAO on-chain to ensure transparency and adaptability. A need’s Difficulty Score is the 0–100 value we compute by combining its five criterion percentiles via the DAO-voted AHP weights.
 
