@@ -188,7 +188,7 @@ $$
 
 $$
 \text{TotalMultiplier}_{\text{summed}} =
-\sum
+\sum_{\substack{i \\ \text{Perf}_i > 50}}
 $$
 
  3. Apply Cap, A DAO-governed cap to prevent excessive inflation.:
