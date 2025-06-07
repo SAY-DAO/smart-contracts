@@ -6,15 +6,9 @@
 * [Difficulty vs. Urgency](#difficulty-vs-urgency)
 * [DAO-Governed AHP Difficulty Scoring](#dao-governed-ahp-difficulty-scoring)
 
-  * [Criterion Metrics](#criterion-metrics)
-  * [Percentile Formulas](#percentile-formulas)
-  * [Difficulty Calculation](#difficulty-calculation)
-* [Example](#example)
+  * [Example](#example)
 * [Weighting via AHP](#weighting-via-ahp)
 
-  * [Pairwise Voting](#pairwise-voting)
-  * [Compute Weights](#compute-weights)
-  * [Consistency Check](#consistency-check)
 * [Token Minting and Allocation](#token-minting-and-allocation)
 
   * [Multiplier Structure](#multiplier-structure)
