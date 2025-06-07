@@ -24,7 +24,7 @@
 * [Virtual Family Pool Distribution](#virtual-family-pool-distribution)
 
 # Intro
-In this document, we present a comprehensive, DAO-governed framework for quantifying and rewarding the effort involved in fulfilling “needs” within a tokenized ecosystem. Building upon the analytic hierarchy process (AHP) methodology and sustainability principles originally developed by Kim, Hong, and Majer in their study of value-driven token economies on blockchain platforms [[link](https://www.mdpi.com/1999-5903/16/5/178)], we extend that approach to a broader, need-fulfillment context.
+In this document, we present a comprehensive, DAO-governed framework for quantifying and rewarding the effort involved in fulfilling “needs” within a tokenized ecosystem. Building upon the analytic hierarchy process (AHP) methodology and sustainability principles originally developed by Kim, Hong, and Majer in their study of [value-driven token economies on blockchain platforms](https://www.mdpi.com/1999-5903/16/5/178), we extend that approach to a broader, need-fulfillment context.
 
 By integrating AHP’s structured decision-making with on-chain governance, our framework not only quantifies effort in a transparent, adaptable manner but also embeds democratic accountability at every stage of token issuance and distribution.
 # Difficulty Score 
