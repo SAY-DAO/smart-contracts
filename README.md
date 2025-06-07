@@ -1,3 +1,27 @@
+
+**Table of Contents**
+
+* [Difficulty Score](#difficulty-score)
+* [Difficulty vs. Urgency](#difficulty-vs-urgency)
+* [DAO-Governed AHP Difficulty Scoring](#dao-governed-ahp-difficulty-scoring)
+
+  * [Criterion Metrics](#criterion-metrics)
+  * [Percentile Formulas](#percentile-formulas)
+  * [Difficulty Calculation](#difficulty-calculation)
+* [Example](#example)
+* [Weighting via AHP](#weighting-via-ahp)
+
+  * [Pairwise Voting](#pairwise-voting)
+  * [Compute Weights](#compute-weights)
+  * [Consistency Check](#consistency-check)
+* [Token Minting and Allocation](#token-minting-and-allocation)
+
+  * [Multiplier Structure](#multiplier-structure)
+* [Role-Based Token Splits](#role-based-token-splits)
+
+  * [Example - Token Split](#example---token-split)
+* [Virtual Family Pool Distribution](#virtual-family-pool-distribution)
+
 # Difficulty Score 
 Every step from discovering to delivering a need to a child vary widely in complexity and urgency. Our token-reward system quantify each need’s difficulty and reward all participants appropriately. We use the Analytic Hierarchy Process (AHP) to combine multiple difficulty factors into a single score. Delivered needs with higher difficulty generate more tokens, scaled by a multiplier and the number of virtual families involved. All parameters that determine the difficulty score of a need (weights, caps, splits, etc.) are governed by the DAO on-chain to ensure transparency and adaptability. A need’s Difficulty Score is the 0–100 value we compute by combining its five criterion percentiles via the DAO-voted AHP weights.
 
