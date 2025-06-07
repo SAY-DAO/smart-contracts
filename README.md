@@ -181,20 +181,20 @@ By using percentiles, we naturally accommodate skewed distributions—if one aun
  1. For any particular need compute each virtual family members' Individual Multiplier, it will be 0 for those below 50% percentile:
 
 $$
-\text{Individual-Multiplier}_i= \max(0, \frac{Performance_i​−50}{50}) \quad(\text{range: }0 \text{–} 1).
+\text{Individual Multiplier}_i= \max(0, \frac{Performance_i​−50}{50}) \quad(\text{range: }0 \text{–} 1).
 $$
 
  2. Sum all Individual Multiplier values (only where Performance > 50):
 
 $$
-\text{TotalMultiplier}=\sum_{i \text{ where Perf}_i > 50} \text{Individual-Multiplier}_i
+\text{TotalMultiplier} =
+\sum_{\substack{i \\ \text{Perf}_i > 50}} \text{Individual Multiplier}_i
 $$
-
 
  3. Apply Cap, A DAO-governed cap to prevent excessive inflation.:
 
 $$
-\text{FinalMultiplier}= min(1+TotalMultiplier_{\text{summed}}​,Cap)
+\text{FinalMultiplier}= min(1+TotalMultiplier​, Cap)
 $$
 
 
