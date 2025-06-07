@@ -188,6 +188,7 @@ $$
 
 $$
 \mathrm{TotalMultiplier}_{\mathrm{summed}}
+\;=\;
 $$
 
  3. Apply Cap, A DAO-governed cap to prevent excessive inflation.:
