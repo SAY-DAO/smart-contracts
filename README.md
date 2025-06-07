@@ -186,12 +186,10 @@ $$
 
  2. Sum all Individual Multiplier values (only where Performance > 50):
 
-
-<p align="center">
-  <img
-    src="https://latex.codecogs.com/svg.image?\displaystyle\color{white}\mathrm{TotalMultiplier}_{\mathrm{summed}}%20=%20\sum_{\substack{i=1\\\mathrm{Performance}_i>50}}^{n}%20\mathrm{IndividualMultiplier}_i"
-    alt="TotalMultiplier = sum over i=1 to n where Performance_i > 50" />
-</p>
+$$
+\text{TotalMultiplier}_{\text{summed}} =
+\sum
+$$
 
  3. Apply Cap, A DAO-governed cap to prevent excessive inflation.:
 
